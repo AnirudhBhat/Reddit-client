@@ -1,0 +1,95 @@
+ext.lib = [:]
+
+def app_versioning = [:]
+app_versioning.major = 3
+app_versioning.minor = 2
+app_versioning.patch = 2
+app_versioning.build = 1 // Increase build with every release made to QA and Store
+ext.app_versioning = app_versioning
+
+ext.getVersionCode = { ->
+    def major = app_versioning.major
+    def minor = app_versioning.minor > 10 ? "$app_versioning.minor" : "0$app_versioning.minor"
+    def patch = app_versioning.patch > 10 ? "$app_versioning.patch" : "0$app_versioning.patch"
+    def build = app_versioning.build > 10 ? "$app_versioning.build" : "0$app_versioning.build"
+    return "$major$minor$patch$build".toInteger()
+}
+
+ext.getVersionName = { ->
+    return "$app_versioning.major.$app_versioning.minor.$app_versioning.patch"
+}
+
+def build_versions = [:]
+build_versions.min_sdk = 21
+build_versions.compile_sdk = 29
+build_versions.target_sdk = 29
+build_versions.build_tools = "29.0.2"
+build_versions.version_code = getVersionCode()
+build_versions.version_name = getVersionName()
+ext.build_versions = build_versions
+
+def versions = [:]
+versions.android_gradle_plugin = '3.5.2'
+versions.kotlin = '1.3.50'
+versions.junit = '4.13'
+versions.appcompat = '1.1.0'
+versions.corektx = '1.2.0'
+versions.constraintlayout = '1.1.3'
+versions.junitext = '1.1.1'
+versions.espressocore = '3.2.0'
+versions.coretesting = '2.0.0-rc01'
+versions.rules = '1.1.0'
+versions.runners = '1.1.0'
+versions.mockitokotlin = '2.1.0'
+versions.lifecyclecompiler = '2.0.0-rc01'
+versions.coroutinesandroid = '1.1.1'
+versions.coroutinesadapter = '0.9.2'
+versions.moshiconverter = '2.4.0'
+versions.threetenabp = '1.1.0'
+versions.okhttp = '3.14.0'
+versions.retrofit = '2.5.0'
+versions.retrofitgsonconverter = '2.5.0'
+versions.retrofitlogging = '3.11.0'
+versions.lifecycleviewmodelktx = '2.1.0-beta01'
+versions.koinandroid = '1.0.2'
+versions.material = '1.0.0'
+
+def lib = [:]
+lib.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+lib.kotlin_gradle_plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+lib.appcompat = "androidx.appcompat:appcompat:$versions.appcompat"
+lib.corektx = "androidx.core:core-ktx:$versions.corektx"
+lib.constraintlayout = "androidx.constraintlayout:constraintlayout:$versions.constraintlayout"
+lib.junit = "junit:junit:$versions.junit"
+lib.junitext = "androidx.test.ext:junit:$versions.junitext"
+lib.espressocore = "androidx.test.espresso:espresso-core:$versions.espressocore"
+lib.coretesting = "androidx.arch.core:core-testing:$versions.coretesting"
+lib.rules = "androidx.test:rules:$versions.rules"
+lib.runner = "androidx.test:runner:$versions.runner"
+lib.mockitokotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitokotlin"
+lib.lifecyclecompiler = "androidx.lifecycle:lifecycle-compiler:$versions.lifecyclecompiler"
+lib.coroutinesandroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutinesandroid"
+lib.coroutinesadapter = "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$versions.coroutinesadapter"
+lib.moshiconverter = "com.squareup.retrofit2:converter-moshi:$versions.moshiconverter"
+lib.threetenabp = "com.jakewharton.threetenabp:threetenabp:$versions.threetenabp"
+lib.okhttp = "com.squareup.okhttp3:okhttp:$versions.okhttp"
+lib.retrofit = "com.squareup.retrofit2:retrofit:$versions.retrofit"
+lib.retrofitgsonconverter = "com.squareup.retrofit2:converter-gson:$versions.retrofitgsonconverter"
+lib.lifecycleviewmodelktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycleviewmodelktx"
+lib.koinandroid = "org.koin:koin-android:$versions.koinandroid"
+lib.koinviewmodel = "org.koin:koin-android-viewmodel:$versions.koinandroid"
+lib.material = "com.google.android.material:material:$versions.material"
+lib.retrofitlogging = "com.squareup.okhttp3:logging-interceptor:$versions.retrofitlogging"
+ext.lib = lib
+
+def kotlin = [:]
+kotlin.kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+lib.kotlin = kotlin
+
+def addRepos(RepositoryHandler handler) {
+    handler.google()
+    handler.jcenter()
+    handler.maven { url 'https://jitpack.io' }
+}
+
+ext.addRepos = this.&addRepos

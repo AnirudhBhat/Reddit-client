@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/front_page"
+        android:enabled="true"
+        android:title="Front page"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/subreddit"
+        android:enabled="true"
+        android:title="Subreddits"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/profile"
+        android:enabled="true"
+        android:title="Profile"
+        app:showAsAction="always" />
+</menu>

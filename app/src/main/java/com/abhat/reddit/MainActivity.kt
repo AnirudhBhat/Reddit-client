@@ -13,11 +13,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //startActivity(Intent(this, OauthActivity::class.java))
-
+        replaceFragment(FeedFragment.newInstance())
         bottom_navigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.profile -> {
                     startActivity(Intent(this@MainActivity, OauthActivity::class.java))
+                    true
+                }
+
+                R.id.front_page -> {
+                    replaceFragment(FeedFragment.newInstance())
                     true
                 }
 
@@ -28,10 +33,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    fun replaceFragment(fragment: Fragment) {
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(R.id.container, fragment, "general")
-//            .commitAllowingStateLoss()
-//    }
+    fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container, fragment, "general")
+            .commitAllowingStateLoss()
+    }
 }

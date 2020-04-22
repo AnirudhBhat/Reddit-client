@@ -31,6 +31,8 @@ data class PostDetailResponse(
                 var isGif: Boolean,
                 var gifLink: String,
                 var imageUrl: String?,
+                @field:Json(name="over_18")
+                val over18: Boolean? = null,
                 @field:Json(name = "crosspost_parent_list")
                     val crossPost: List<Preview.Images.Resolutions.Media.RedditVideo.Oembed.CrossPost>,
                 @field:Json(name = "saved")

@@ -50,9 +50,12 @@ dependencies {
     implementation lib.material
     implementation lib.threetenabp
     implementation lib.moshiconverter
+    implementation lib.glide
+    kapt lib.glidecompiler
     testImplementation lib.junit
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
     implementation project(path: ':core')
     implementation project(path: ':oauth')
+    implementation project(path: ':feed')
 }

@@ -53,6 +53,7 @@ versions.retrofitlogging = '3.11.0'
 versions.lifecycleviewmodelktx = '2.1.0-beta01'
 versions.koinandroid = '1.0.2'
 versions.material = '1.0.0'
+versions.glide = '4.9.0'
 
 def lib = [:]
 lib.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
@@ -80,6 +81,8 @@ lib.koinandroid = "org.koin:koin-android:$versions.koinandroid"
 lib.koinviewmodel = "org.koin:koin-android-viewmodel:$versions.koinandroid"
 lib.material = "com.google.android.material:material:$versions.material"
 lib.retrofitlogging = "com.squareup.okhttp3:logging-interceptor:$versions.retrofitlogging"
+lib.glide = "com.github.bumptech.glide:glide:$versions.glide"
+lib.glidecompiler = "com.github.bumptech.glide:compiler:$versions.glide"
 ext.lib = lib
 
 def kotlin = [:]

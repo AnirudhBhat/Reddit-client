@@ -37,20 +37,12 @@
                     android:adjustViewBounds="true"
                     android:scaleType="fitXY"/>
 
-                <com.google.android.exoplayer2.ui.PlayerView
-                    android:id="@+id/exoplayer"
-                    android:layout_width="match_parent"
-                    android:layout_height="370dp"
-                    android:visibility="gone">
-
-                </com.google.android.exoplayer2.ui.PlayerView>
-
                 <RelativeLayout
                     android:id="@+id/nsfw_overlay"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    android:background="@android:color/holo_red_light">
+                    android:background="@android:color/holo_red_dark">
 
                     <TextView
                         android:id="@+id/nsfw_text"

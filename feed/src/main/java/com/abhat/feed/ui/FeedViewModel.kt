@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.data.FeedRepository
+import com.abhat.feed.ui.state.FeedViewResult
 import com.abhat.feed.ui.state.FeedViewState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -15,7 +16,7 @@ import kotlinx.coroutines.withContext
 class FeedViewModel(
     private val feedRepository: FeedRepository,
     private val contextProvider: CoroutineContextProvider
-): ViewModel() {
+) : ViewModel() {
 
     val feedViewState: MutableLiveData<FeedViewState> = MutableLiveData()
 
@@ -35,22 +36,38 @@ class FeedViewModel(
 
     fun getFeed(subreddit: String) {
         viewModelScope.launch(contextProvider.Main) {
-            try {
-                val response =
-                    withContext(viewModelScope.coroutineContext + contextProvider.IO) {
-                        feedRepository.getFeed(subreddit)
-                    }
-                response?.let { response ->
-                    currentViewState = currentViewState.copy(
-                        isLoading = false,
-                        feedList = response.data,
-                        error = null
-                    )
+            val feedViewResult =
+                withContext(viewModelScope.coroutineContext + contextProvider.IO) {
+                    feedRepository.getFeed(subreddit)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                currentViewState =
-                    currentViewState.copy(isLoading = false, feedList = null, error = e.cause)
+            feedViewResult?.let { feedViewResult ->
+                when (feedViewResult) {
+                    is FeedViewResult.Success -> {
+                        currentViewState = currentViewState.copy(
+                            isLoading = false,
+                            feedList = feedViewResult.feedData,
+                            error = null
+                        )
+                    }
+
+                    is FeedViewResult.Error.NetworkError -> {
+                        currentViewState =
+                            currentViewState.copy(
+                                isLoading = false,
+                                feedList = null,
+                                error = feedViewResult.throwable
+                            )
+                    }
+
+                    is FeedViewResult.Error.AuthorizationError -> {
+                        currentViewState =
+                            currentViewState.copy(
+                                isLoading = false,
+                                feedList = null,
+                                authorizationError = feedViewResult.throwable
+                            )
+                    }
+                }
             }
         }
     }

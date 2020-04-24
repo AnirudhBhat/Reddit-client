@@ -1,10 +1,10 @@
 package com.abhat.feed.data
 
-import com.abhat.core.model.PostDetailResponse
+import com.abhat.feed.ui.state.FeedViewResult
 
 /**
  * Created by Anirudh Uppunda on 22,April,2020
  */
 interface FeedRepository {
-    suspend fun getFeed(subreddit: String): PostDetailResponse
+    suspend fun getFeed(subreddit: String): FeedViewResult?
 }

@@ -120,11 +120,12 @@ class FeedAdapter(private val context: Context,
                 }
             }
         } ?: run {
-
+            image.visibility = View.GONE
         }
     }
 
     private fun loadImageOrGif(url: String?, image: ImageView, adapterPosition: Int) {
+        image.visibility = View.VISIBLE
         redditData?.children?.get(adapterPosition)?.data?.imageUrl = url
         Glide.with(context)
             .load(url)

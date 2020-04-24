@@ -47,12 +47,36 @@ class FeedFragment : Fragment() {
     private fun observeViewModel() {
         feedViewModel.feedViewState.observe(this, Observer { feedViewState ->
             setProgressBarVisibility(feedViewState)
-            feedViewState.error?.let { throwable ->
-                showErrorToast("oops, something went wrong!")
-            } ?: run {
+            if (anyError(feedViewState)) {
+                if (isNetworkError(feedViewState)) {
+                    showErrorToast("oops, something went wrong!, please check your connection")
+                } else if (isAuthorizationError(feedViewState)) {
+                    showErrorToast("Please sign in to use this feature")
+                }
+            } else {
                 feedAdapter?.updateRedditData(feedViewState.feedList)
             }
+//            feedViewState.error?.let { throwable ->
+//                showErrorToast("oops, something went wrong!")
+//            } ?: run {
+//                feedAdapter?.updateRedditData(feedViewState.feedList)
+//            }
         })
+    }
+
+    private fun anyError(feedViewState: FeedViewState): Boolean {
+        if (feedViewState.error != null || feedViewState.authorizationError != null) {
+            return true
+        }
+        return false
+    }
+
+    private fun isNetworkError(feedViewState: FeedViewState): Boolean {
+        return feedViewState.error != null
+    }
+
+    private fun isAuthorizationError(feedViewState: FeedViewState): Boolean {
+        return feedViewState.authorizationError != null
     }
 
     private fun setProgressBarVisibility(viewState: FeedViewState) {

@@ -8,5 +8,6 @@ import com.abhat.core.model.PostDetailResponse
 data class FeedViewState(
     val isLoading: Boolean = false,
     val feedList: PostDetailResponse.Data? = null,
-    val error: Throwable? = null
+    val error: Throwable? = null,
+    val authorizationError: Throwable? = null
 )

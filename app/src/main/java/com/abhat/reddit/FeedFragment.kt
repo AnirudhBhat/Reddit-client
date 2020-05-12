@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.ui.FeedViewModel
 import com.abhat.feed.ui.state.FeedViewState
 import com.abhat.reddit.adapter.FeedAdapter
@@ -22,6 +23,13 @@ class FeedFragment : Fragment() {
     private var feedRecyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var feedAdapter: FeedAdapter? = null
+    private var after: String = ""
+    private val SUBREDDIT = "all"
+
+    private var loading = false
+    var pastVisiblesItems: Int = 0
+    var visibleItemCount:Int = 0
+    var totalItemCount:Int = 0
 
     private val feedViewModel: FeedViewModel by inject()
 
@@ -40,7 +48,7 @@ class FeedFragment : Fragment() {
         setupRecyclerView(view)
         observeViewModel()
         feedViewModel.showProgressBar()
-        feedViewModel.getFeed("all")
+        feedViewModel.getFeed(SUBREDDIT, after)
         return view
     }
 
@@ -54,13 +62,14 @@ class FeedFragment : Fragment() {
                     showErrorToast("Please sign in to use this feature")
                 }
             } else {
-                feedAdapter?.updateRedditData(feedViewState.feedList)
+                after = feedViewState?.feedList?.data?.after ?: ""
+                if (loading) {
+                    feedAdapter?.addRedditData(feedViewState.feedList?.data?.children)
+                } else {
+                    feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children)
+                }
             }
-//            feedViewState.error?.let { throwable ->
-//                showErrorToast("oops, something went wrong!")
-//            } ?: run {
-//                feedAdapter?.updateRedditData(feedViewState.feedList)
-//            }
+            loading = false
         })
     }
 
@@ -91,8 +100,31 @@ class FeedFragment : Fragment() {
         feedRecyclerView = itemView.findViewById(R.id.feed_recycler_view)
         layoutManager = LinearLayoutManager(activity)
         feedRecyclerView?.layoutManager = layoutManager
-        feedAdapter = FeedAdapter(activity!!, null)
+//        feedRecyclerView?.setItemViewCacheSize(10)
+        feedAdapter = FeedAdapter(activity!!, feedViewModel, null, CoroutineContextProvider())
+        feedAdapter?.observeLiveData()
         feedRecyclerView?.adapter = feedAdapter
+
+        feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                //super.onScrolled(recyclerView, dx, dy)
+                if(dy > 0) //check for scroll down
+                {
+                    visibleItemCount = (layoutManager as LinearLayoutManager).childCount
+                    totalItemCount = (layoutManager as LinearLayoutManager).itemCount
+                    pastVisiblesItems = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+
+                    if (!loading)
+                    {
+                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
+                        {
+                            loading = true
+                            feedViewModel.getFeed(SUBREDDIT, after)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private fun showErrorToast(message: String) {

@@ -10,7 +10,7 @@ data class PostDetailResponse(
 ) {
     data class Data(
         @field:Json(name = "after")
-            val after: Any?,
+            val after: String?,
         @field:Json(name = "before")
             val before: Any?,
         @field:Json(name = "children")
@@ -98,11 +98,17 @@ data class PostDetailResponse(
                 ) {
                     data class Images(
                             @field:Json(name="resolutions")
-                            val resolutions:List<Resolutions>?
+                            val resolutions:List<Resolutions>?,
+                            @field:Json(name="source")
+                            val source: Resolutions
                     ) {
                         data class Resolutions(
                                 @field:Json(name="url")
-                                val url:String?
+                                val url:String?,
+                                @field:Json(name="width")
+                                val width:Int?,
+                                @field:Json(name="height")
+                                val height:Int?
                         ) {
                             data class Media(
                                 @field:Json(name="reddit_video")

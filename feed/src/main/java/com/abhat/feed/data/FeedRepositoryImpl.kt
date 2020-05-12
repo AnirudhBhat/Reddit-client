@@ -7,12 +7,12 @@ import retrofit2.HttpException
 /**
  * Created by Anirudh Uppunda on 22,April,2020
  */
-class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository {
+open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository {
 
-    override suspend fun getFeed(subreddit: String): FeedViewResult? {
+    override suspend fun getFeed(subreddit: String, after: String): FeedViewResult? {
         try {
-            val response = redditApi.getRedditList(subreddit).await()
-            return FeedViewResult.Success(response.data)
+            val response = redditApi.getRedditList(subreddit, after).await()
+            return FeedViewResult.Success(response)
         } catch (e: Exception) {
             return if (e is HttpException) {
                 when (e.code()) {

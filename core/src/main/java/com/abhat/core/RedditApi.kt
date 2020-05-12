@@ -1,6 +1,7 @@
 package com.abhat.core
 
 import com.abhat.core.model.PostDetailResponse
+import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
@@ -18,7 +19,7 @@ interface RedditApi {
 
 
     @GET("/r/{subreddit}/.json")
-    fun getRedditList(@Path("subreddit") subreddit: String, @Query("after") after: String = ""): Deferred<PostDetailResponse>
+    fun getRedditList(@Path("subreddit") subreddit: String, @Query("after") after: String = ""): Deferred<RedditResponse>
 
     @GET("/r/{subreddit}/.json")
     fun getRedditListPost(@HeaderMap headers: Map<String, String>,

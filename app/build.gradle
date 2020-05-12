@@ -27,6 +27,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
     lintOptions {
         abortOnError true
     }
@@ -53,9 +57,12 @@ dependencies {
     implementation lib.glide
     kapt lib.glidecompiler
     testImplementation lib.junit
+    testImplementation lib.coretesting
+    testImplementation lib.mockitokotlin
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
     implementation project(path: ':core')
     implementation project(path: ':oauth')
     implementation project(path: ':feed')
+    implementation("io.coil-kt:coil:0.10.1")
 }

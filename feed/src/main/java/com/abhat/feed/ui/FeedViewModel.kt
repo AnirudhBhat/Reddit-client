@@ -1,5 +1,7 @@
 package com.abhat.feed.ui
 
+import android.view.View
+import android.widget.RelativeLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +15,7 @@ import kotlinx.coroutines.withContext
 /**
  * Created by Anirudh Uppunda on 20,April,2020
  */
-class FeedViewModel(
+open class FeedViewModel(
     private val feedRepository: FeedRepository,
     private val contextProvider: CoroutineContextProvider
 ) : ViewModel() {
@@ -26,6 +28,8 @@ class FeedViewModel(
             feedViewState.postValue(value)
         }
 
+    val isNsfwLiveData: MutableLiveData<Pair<Boolean, RelativeLayout?>> = MutableLiveData()
+
     fun showProgressBar() {
         currentViewState = currentViewState.copy(isLoading = true, feedList = null, error = null)
     }
@@ -34,11 +38,11 @@ class FeedViewModel(
         currentViewState = currentViewState.copy(isLoading = false, feedList = null, error = null)
     }
 
-    fun getFeed(subreddit: String) {
+    fun getFeed(subreddit: String, after: String) {
         viewModelScope.launch(contextProvider.Main) {
             val feedViewResult =
                 withContext(viewModelScope.coroutineContext + contextProvider.IO) {
-                    feedRepository.getFeed(subreddit)
+                    feedRepository.getFeed(subreddit, after)
                 }
             feedViewResult?.let { feedViewResult ->
                 when (feedViewResult) {

@@ -28,8 +28,8 @@ class FeedFragment : Fragment() {
 
     private var loading = false
     var pastVisiblesItems: Int = 0
-    var visibleItemCount:Int = 0
-    var totalItemCount:Int = 0
+    var visibleItemCount: Int = 0
+    var totalItemCount: Int = 0
 
     private val feedViewModel: FeedViewModel by inject()
 
@@ -55,21 +55,24 @@ class FeedFragment : Fragment() {
     private fun observeViewModel() {
         feedViewModel.feedViewState.observe(this, Observer { feedViewState ->
             setProgressBarVisibility(feedViewState)
-            if (anyError(feedViewState)) {
-                if (isNetworkError(feedViewState)) {
-                    showErrorToast("oops, something went wrong!, please check your connection")
-                } else if (isAuthorizationError(feedViewState)) {
-                    showErrorToast("Please sign in to use this feature")
-                }
-            } else {
-                after = feedViewState?.feedList?.data?.after ?: ""
-                if (loading) {
-                    feedAdapter?.addRedditData(feedViewState.feedList?.data?.children)
+            if (!feedViewState.isLoading) {
+                if (anyError(feedViewState)) {
+                    if (isNetworkError(feedViewState)) {
+                        showErrorToast("oops, something went wrong!, please check your connection")
+                    } else if (isAuthorizationError(feedViewState)) {
+                        showErrorToast("Please sign in to use this feature")
+                    }
                 } else {
-                    feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children)
+                    after = feedViewState?.feedList?.data?.after ?: ""
+                    if (loading) {
+                        feedAdapter?.addRedditData(feedViewState.feedList?.data?.children)
+                    } else {
+                        feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children)
+                        feedRecyclerView?.scheduleLayoutAnimation()
+                    }
+                    loading = false
                 }
             }
-            loading = false
         })
     }
 
@@ -100,24 +103,20 @@ class FeedFragment : Fragment() {
         feedRecyclerView = itemView.findViewById(R.id.feed_recycler_view)
         layoutManager = LinearLayoutManager(activity)
         feedRecyclerView?.layoutManager = layoutManager
-//        feedRecyclerView?.setItemViewCacheSize(10)
         feedAdapter = FeedAdapter(activity!!, feedViewModel, null, CoroutineContextProvider())
-        feedAdapter?.observeLiveData()
         feedRecyclerView?.adapter = feedAdapter
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                //super.onScrolled(recyclerView, dx, dy)
-                if(dy > 0) //check for scroll down
-                {
+                if (dy > 0) {
                     visibleItemCount = (layoutManager as LinearLayoutManager).childCount
                     totalItemCount = (layoutManager as LinearLayoutManager).itemCount
-                    pastVisiblesItems = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    pastVisiblesItems =
+                        (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
-                    if (!loading)
-                    {
-                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
-                        {
+                    if (!loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            feedViewModel.showProgressBar()
                             loading = true
                             feedViewModel.getFeed(SUBREDDIT, after)
                         }

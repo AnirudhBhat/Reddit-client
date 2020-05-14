@@ -7,5 +7,7 @@ import com.squareup.moshi.Json
  */
 data class Preview(
     @field:Json(name="images")
-    val images:List<Images>?
+    val images:List<Images>?,
+    @field:Json(name = "reddit_video_preview")
+    val redditVideoPreview: RedditVideo?
 )

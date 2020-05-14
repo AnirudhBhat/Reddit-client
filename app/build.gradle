@@ -55,6 +55,7 @@ dependencies {
     implementation lib.threetenabp
     implementation lib.moshiconverter
     implementation lib.glide
+    implementation lib.exoplayer
     kapt lib.glidecompiler
     testImplementation lib.junit
     testImplementation lib.coretesting

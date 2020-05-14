@@ -167,23 +167,30 @@ class FeedAdapterTest {
     }
 
     @Test
-    fun `isItAGif method must return true if url is of gif`() {
+    fun `isItAGif method must NOT return true if url is type reddit domain gif`() {
         runBlocking {
-            Assert.assertEquals(true, feedAdapter.isItAGif(returnChildren(url = "https://v.redd.it/py2ql468uqx41"), position = 0))
+            Assert.assertEquals(false, feedAdapter.isItAGif(returnChildren(url = "https://v.redd.it/py2ql468uqx41"), position = 0))
         }
     }
 
     @Test
-    fun `isItAGif method must return true if url contains gif`() {
+    fun `isItAGif method must return true if url ends with gif`() {
         runBlocking {
             Assert.assertEquals(true, feedAdapter.isItAGif(returnChildren(url = "https://test/py2ql468uqx41.gif"), position = 0))
         }
     }
 
     @Test
-    fun `isItAGif method must return true if url contains gfycat`() {
+    fun `isItAGif method must return true if url ends with gifv`() {
         runBlocking {
-            Assert.assertEquals(true, feedAdapter.isItAGif(returnChildren(url = "https://testgfycat/py2ql468uqx41.gif"), position = 0))
+            Assert.assertEquals(true, feedAdapter.isItAGif(returnChildren(url = "https://test/py2ql468uqx41.gifv"), position = 0))
+        }
+    }
+
+    @Test
+    fun `isItAGif method must NOT return true if url contains gfycat`() {
+        runBlocking {
+            Assert.assertEquals(false, feedAdapter.isItAGif(returnChildren(url = "https://testgfycat/py2ql468uqx41"), position = 0))
         }
     }
 
@@ -366,6 +373,7 @@ class FeedAdapterTest {
 
         return ChildrenData(false,
                 "",
+            false,
                 "",
                 true,
                 listOf(),
@@ -398,7 +406,8 @@ class FeedAdapterTest {
         returnPreview(previewSize),
         null,
             domain = domain,
-        isVideo = isVideo)
+        isVideo = isVideo,
+        secureMedia = null)
     }
 
     private fun returnPreview(size: Int): Preview? {
@@ -417,7 +426,7 @@ class FeedAdapterTest {
                                 width = 108,
                                 height = 108
                             )
-                    ))))
+                    ))), null)
             }
 
             2 -> {
@@ -439,7 +448,7 @@ class FeedAdapterTest {
                                 width = 216,
                                 height = 216
                             )
-                        ))))
+                        ))), null)
             }
 
             3 -> {
@@ -466,7 +475,7 @@ class FeedAdapterTest {
                                 width = 320,
                                 height = 320
                             )
-                        ))))
+                        ))), null)
             }
 
             4 -> {
@@ -498,7 +507,7 @@ class FeedAdapterTest {
                                 width = 640,
                                 height = 640
                             )
-                        ))))
+                        ))), null)
             }
 
             5 -> {
@@ -535,7 +544,7 @@ class FeedAdapterTest {
                                 width = 960,
                                 height = 960
                             )
-                        ))))
+                        ))), null)
             }
 
             6 -> {
@@ -577,7 +586,7 @@ class FeedAdapterTest {
                                 width = 1080,
                                 height = 1080
                             )
-                        ))))
+                        ))), null)
             }
 
             else -> {

@@ -8,7 +8,8 @@ import com.squareup.moshi.Json
  */
 data class ChildrenData(
     var isGif: Boolean,
-    var gifLink: String,
+    var gifLink: String?,
+    var shouldUseGlideForGif: Boolean = false,
     var imageUrl: String? = null,
     @field:Json(name="over_18")
     val over18: Boolean? = null,
@@ -70,6 +71,8 @@ data class ChildrenData(
     val preview: Preview?,
     @field:Json(name="media")
     val media: Media?,
+    @field:Json(name="secure_media")
+    val secureMedia: SecureMedia?,
     @field:Json(name="is_video")
     val isVideo: Boolean = false,
     @field:Json(name="domain")

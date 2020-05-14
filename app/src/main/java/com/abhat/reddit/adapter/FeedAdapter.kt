@@ -1,5 +1,6 @@
 package com.abhat.reddit.adapter
 
+import android.content.Intent
 import android.text.Html
 import android.text.format.DateUtils
 import android.util.DisplayMetrics
@@ -15,6 +16,8 @@ import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
 import com.abhat.feed.ui.FeedAdapterController
 import com.abhat.feed.ui.FeedViewModel
+import com.abhat.reddit.MainActivity
+import com.abhat.reddit.MediaActivity
 import com.abhat.reddit.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -36,20 +39,9 @@ open class FeedAdapter(
 
     private var view: FeedViewHolder? = null
     private var feedAdapterController: FeedAdapterController? = null
+    private var gifUrl: String? = null
     private val ioScope = CoroutineScope(contextProvider.IO + SupervisorJob())
     private val mainScope = CoroutineScope(contextProvider.Main + SupervisorJob())
-
-    fun observeLiveData() {
-        feedViewModel.isNsfwLiveData.observe(context!!, androidx.lifecycle.Observer { pair ->
-            view?.let {
-                if (pair.first) {
-                    pair.second?.visibility = View.VISIBLE
-                } else {
-                    pair.second?.visibility = View.GONE
-                }
-            }
-        })
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)
@@ -86,7 +78,7 @@ open class FeedAdapter(
             withContext(contextProvider.Main) {
                 holder.bind(
                     title, author, points, comments, subreddit, "",
-                    created, "", over18
+                    created, "", over18, position
                 )
             }
         }
@@ -127,7 +119,10 @@ open class FeedAdapter(
         }
     }
 
-    suspend fun shouldShowNewsSourceOverlay(redditData: MutableList<Children>?, position: Int): Boolean {
+    suspend fun shouldShowNewsSourceOverlay(
+        redditData: MutableList<Children>?,
+        position: Int
+    ): Boolean {
         return withContext(ioScope.coroutineContext) {
             redditData?.get(position)?.data?.preview != null
         }
@@ -138,8 +133,8 @@ open class FeedAdapter(
         position: Int
     ): Pair<String, String> {
         return withContext(ioScope.coroutineContext) {
-            val data = redditData?.get(position)?.data!!
-            Pair(getHostNameFromUrl(data.url ?: "") ?: "", data.url ?: "")
+            val data = redditData?.get(position)?.data ?: null
+            Pair(getHostNameFromUrl(data?.url ?: "") ?: "", data?.url ?: "")
         }
     }
 
@@ -147,19 +142,77 @@ open class FeedAdapter(
         return withContext(ioScope.coroutineContext) {
             val url = redditData?.get(position)?.data?.url ?: ""
             withContext(mainScope.coroutineContext) {
-                (url.contains("gifv")
-                        || url.contains("v.redd.it")
-                        || url.contains("gif")
-                        || url.contains("gfycat"))
+                if ((url.endsWith("gifv")
+                        || url.endsWith("gif"))) {
+                    redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    redditData?.get(position)?.data?.gifLink = url
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    suspend fun isItAGifFromGfycat(redditData: MutableList<Children>?, position: Int): Boolean {
+        return withContext(ioScope.coroutineContext) {
+            val type = redditData?.get(position)?.data?.secureMedia?.type ?: ""
+            if (type.contains("gfycat")) {
+                redditData?.get(position)?.data?.preview?.redditVideoPreview?.fallbackUrl?.let {
+                    redditData?.get(position)?.data?.gifLink = it
+                    redditData?.get(position)?.data?.shouldUseGlideForGif = false
+                } ?: run {
+                    redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
+                    redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                }
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    suspend fun isItAGifFromReddit(redditData: MutableList<Children>?, position: Int): Boolean {
+        return withContext(ioScope.coroutineContext) {
+            val type = redditData?.get(position)?.data?.secureMedia?.type ?: null
+            if (type == null) {
+                redditData?.get(position)?.data?.secureMedia?.redditVideo?.let { redditVideo ->
+                    redditData?.get(position)?.data?.gifLink = redditVideo.fallbackUrl
+                    redditData?.get(position)?.data?.shouldUseGlideForGif = false
+                    true
+                } ?: run {
+                    redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.url
+                    redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
+                }
+            } else {
+                false
+            }
+        }
+    }
+
+    suspend fun isItGifFromOtherSource(redditData: MutableList<Children>?, position: Int): Boolean {
+        return withContext(ioScope.coroutineContext) {
+            val url = redditData?.get(position)?.data?.url ?: ""
+            if (!isItAGifFromReddit(redditData, position) &&
+                !isItAGifFromGfycat(redditData, position) &&
+                isItAGif(redditData, position)
+            ) {
+                redditData?.get(position)?.data?.gifLink = url
+                true
+            } else {
+                false
             }
         }
     }
 
     suspend fun isItAVideo(redditData: MutableList<Children>?, position: Int): Boolean {
         return withContext(ioScope.coroutineContext) {
-            (redditData?.get(position)?.data?.isVideo ?: false || redditData?.get(position)?.data?.url?.contains(
-                "youtu"
-            ) ?: false)
+            (!isItAGifFromReddit(redditData, position) &&
+                    (redditData?.get(position)?.data?.isVideo ?: false
+                            || redditData?.get(position)?.data?.url?.contains(
+                        "youtu"
+                    ) ?: false))
         }
     }
 
@@ -172,7 +225,10 @@ open class FeedAdapter(
         return null
     }
 
-    suspend fun selectAppropriateResolution(redditData: MutableList<Children>?, adapterPosition: Int): String? {
+    suspend fun selectAppropriateResolution(
+        redditData: MutableList<Children>?,
+        adapterPosition: Int
+    ): String? {
         return withContext(ioScope.coroutineContext) {
             redditData?.get(adapterPosition)?.data?.preview?.let {
                 when {
@@ -242,13 +298,19 @@ open class FeedAdapter(
             bodyHtmlString: String?,
             createdLong: Long,
             selfTextHtml: String?,
-            over18: Boolean?
+            over18: Boolean?,
+            position: Int
         ) {
             feedViewModel.isNsfwLiveData.postValue(Pair(over18 ?: false, itemView.nsfw_overlay))
 
             with(itemView) {
                 mainScope.launch {
-                    val url = selectAppropriateResolution(redditData, adapterPosition)
+                    var url: String? = null
+                    try {
+                        url = selectAppropriateResolution(redditData, position)
+                    } catch (e: ArrayIndexOutOfBoundsException) {
+                        e.printStackTrace()
+                    }
                     url?.let { url ->
                         iv_image.visibility = View.VISIBLE
                         Glide.with(context)
@@ -259,12 +321,33 @@ open class FeedAdapter(
                     } ?: run {
                         iv_image.visibility = View.GONE
                     }
+                    if (over18 == true) {
+                        nsfw_overlay.visibility = View.VISIBLE
+                    } else {
+                        nsfw_overlay.visibility = View.GONE
+                    }
                     when {
-                        isItAGif(redditData, adapterPosition) -> {
+                        isItAGifFromGfycat(redditData, position) -> {
                             gif_indicator.visibility = View.VISIBLE
+                            gif_indicator.text = "Gfycat"
+                            gif_indicator.textSize = 12F
                             video_indicator.visibility = View.GONE
                         }
-                        isItAVideo(redditData, adapterPosition) -> {
+
+                        isItAGifFromReddit(redditData, position) -> {
+                            gif_indicator.visibility = View.VISIBLE
+                            gif_indicator.text = "Reddit"
+                            gif_indicator.textSize = 12F
+                            video_indicator.visibility = View.GONE
+                        }
+
+                        isItGifFromOtherSource(redditData, position) -> {
+                            gif_indicator.visibility = View.VISIBLE
+                            gif_indicator.text = "GIF"
+                            gif_indicator.textSize = 18F
+                            video_indicator.visibility = View.GONE
+                        }
+                        isItAVideo(redditData, position) -> {
                             gif_indicator.visibility = View.GONE
                             video_indicator.visibility = View.VISIBLE
                         }
@@ -273,10 +356,14 @@ open class FeedAdapter(
                             video_indicator.visibility = View.GONE
                         }
                     }
-                    if (isItNews(redditData, adapterPosition) && shouldShowNewsSourceOverlay(redditData, adapterPosition)) {
+                    if (isItNews(redditData, position) && shouldShowNewsSourceOverlay(
+                            redditData,
+                            position
+                        )
+                    ) {
                         news_source_overlay.visibility = View.VISIBLE
                         val domainAndSourceUrlPair =
-                            getNewsDomainAndSourceUrl(redditData, adapterPosition)
+                            getNewsDomainAndSourceUrl(redditData, position)
                         source_url.text = domainAndSourceUrlPair.second
                         domain.text = domainAndSourceUrlPair.first
                     } else {
@@ -291,7 +378,8 @@ open class FeedAdapter(
                     bodyHtmlString,
                     commentsString,
                     authorString,
-                    createdLong
+                    createdLong,
+                    position
                 )
             }
         }
@@ -303,7 +391,8 @@ open class FeedAdapter(
             bodyHtmlString: String?,
             commentsString: String,
             authorString: String,
-            createdLong: Long
+            createdLong: Long,
+            position: Int
         ) {
             with(itemView) {
                 titleString?.let {
@@ -314,7 +403,7 @@ open class FeedAdapter(
                         val titleHtml =
                             Html.fromHtml(Html.fromHtml(bodyHtmlString).toString()).toString()
                         val subredditText =
-                            redditData?.get(adapterPosition)?.data?.linkId?.split("_")?.get(1)
+                            redditData?.get(position)?.data?.linkId?.split("_")?.get(1)
                                 ?: ""
                         withContext(CoroutineContextProvider().Main) {
                             title.text = titleHtml
@@ -339,112 +428,16 @@ open class FeedAdapter(
                 //created.text = dateFormatter(Date(createdLong))
 
 //
-//            image.setOnClickListener {
-//                over18?.let { over18 ->
-//                    if (over18) {
-//                        if (nsfw_overlay.visibility == View.VISIBLE) {
-//                            nsfw_overlay.visibility = View.GONE
-//                        } else {
-//                            nsfw_overlay.visibility = View.VISIBLE
-//                        }
-//                    }
-//                }
-//            }
+                iv_image.setOnClickListener {
+                    val intent = Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
+                    intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
+                    intent.putExtra("shoulduseglide", redditData?.get(position)?.data?.shouldUseGlideForGif)
+                    context.startActivity(intent)
+                }
             }
         }
     }
 
-    private fun selectAppropriateResolution(adapterPosition: Int, image: ImageView) {
-//        redditData?.get(adapterPosition)?.data?.preview?.let {
-////            loadImageOrGif(redditData?.get(adapterPosition)?.data?.preview?.images!![0].source.url?.replace("amp;s", "s")?.replace("amp;", ""),
-////                image,
-////                redditData?.get(adapterPosition)?.data?.preview?.images!![0].source.width,
-////                redditData?.get(adapterPosition)?.data?.preview?.images!![0].source.height,
-////                adapterPosition)
-//            when {
-//                redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!!.size >= 4 -> loadImageOrGif(
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![3].url?.replace(
-//                        "amp;s",
-//                        "s"
-//                    )?.replace("amp;", ""),
-//                    image,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![3].width,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![3].height,
-//                    adapterPosition
-//                )
-//                redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!!.size >= 3 -> loadImageOrGif(
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![2].url?.replace(
-//                        "amp;s",
-//                        "s"
-//                    )?.replace("amp;", ""),
-//                    image,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![2].width,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![2].height,
-//                    adapterPosition
-//                )
-//                redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!!.size >= 2 -> loadImageOrGif(
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![1].url?.replace(
-//                        "amp;s",
-//                        "s"
-//                    )?.replace("amp;", ""),
-//                    image,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![1].width,
-//                    redditData?.get(adapterPosition)?.data?.preview?.images!![0].resolutions!![1].height,
-//                    adapterPosition
-//                )
-//                else -> {
-//                    image.visibility = View.GONE
-//                }
-//            }
-//        } ?: run {
-//            image.visibility = View.GONE
-//        }
-    }
-
-    private fun loadImageOrGif(
-        url: String?,
-        image: ImageView,
-        width: Int?,
-        height: Int?,
-        adapterPosition: Int
-    ) {
-        image.visibility = View.VISIBLE
-//        val requestOptions = RequestOptions()
-//            .override(width ?: convertDpToPixel(640F).toInt(), height ?: convertDpToPixel(854f).toInt())
-        redditData?.get(adapterPosition)?.data?.imageUrl = url
-//        image.layoutParams.width = width ?: 0//convertPixelsToDp(width?.toFloat() ?: 0f).toInt()
-//        image.layoutParams.height = height ?: 0//convertPixelsToDp(height?.toFloat() ?: 0f).toInt()
-//        image.requestLayout()
-//        Glide.with(context)
-        //.asBitmap()
-//            .load(url)
-//            .placeholder(R.color.gray_300)
-//            .transition(DrawableTransitionOptions.withCrossFade())
-//            .transition(GenericTransitionOptions.with(animationObject))
-//            .into(object:  SimpleTarget<Bitmap>(convertDpToPixel(width?.toFloat() ?: 0f).toInt(),
-//                convertDpToPixel(height?.toFloat() ?: 0f).toInt()
-//            ) {
-//                override fun onLoadCleared(placeholder: Drawable?) {
-//
-//                }
-//
-//                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-//                    image.setImageBitmap(resource)
-//                }
-//
-//            })
-//            .placeholder(R.color.gray_300)
-//
-//            .override(width ?: 640, height ?: 854)
-//            .dontAnimate()
-//            .dontTransform()
-//            .into(image)
-
-        image.load(url) {
-            crossfade(true)
-            placeholder(R.color.gray_300)
-        }
-    }
 
     fun dateFormatter(date: Date): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
@@ -455,23 +448,5 @@ open class FeedAdapter(
             DateUtils.MINUTE_IN_MILLIS
         )
         return formattedDate.toString()
-    }
-
-    fun convertPixelsToDp(px: Float): Float {
-        if (context == null) {
-            return 0.0f
-        }
-        val resources = context.resources
-        val metrics = resources.displayMetrics
-        return px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-    }
-
-    fun convertDpToPixel(dp: Float): Float {
-        if (context == null) {
-            return 0.0f
-        }
-        val resources = context.resources
-        val metrics = resources.displayMetrics
-        return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 }

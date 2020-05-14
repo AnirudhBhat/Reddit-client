@@ -9,5 +9,7 @@ data class SecureMedia(
     @field:Json(name = "reddit_video")
     val redditVideo: RedditVideo?,
     @field:Json(name="oembed")
-    val oembed: Oembed?
+    val oembed: Oembed?,
+    @field:Json(name = "type")
+    val type: String?
 )

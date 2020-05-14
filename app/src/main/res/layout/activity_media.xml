@@ -25,6 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:controller_layout_id="@layout/custom_player_ui_layout"
         android:visibility="gone">
 
     </com.google.android.exoplayer2.ui.PlayerView>

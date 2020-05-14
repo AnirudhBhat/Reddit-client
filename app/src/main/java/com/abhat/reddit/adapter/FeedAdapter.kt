@@ -158,12 +158,17 @@ open class FeedAdapter(
         return withContext(ioScope.coroutineContext) {
             val type = redditData?.get(position)?.data?.secureMedia?.type ?: ""
             if (type.contains("gfycat")) {
-                redditData?.get(position)?.data?.preview?.redditVideoPreview?.fallbackUrl?.let {
+                redditData?.get(position)?.data?.preview?.redditVideoPreview?.hlsUrl?.let {
                     redditData?.get(position)?.data?.gifLink = it
                     redditData?.get(position)?.data?.shouldUseGlideForGif = false
                 } ?: run {
-                    redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
-                    redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    redditData?.get(position)?.data?.crossPost?.get(0)?.secureMedia?.oembed?.let { oembed ->
+                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
+                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    } ?: run {
+                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
+                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    }
                 }
                 true
             } else {
@@ -177,13 +182,19 @@ open class FeedAdapter(
             val type = redditData?.get(position)?.data?.secureMedia?.type ?: null
             if (type == null) {
                 redditData?.get(position)?.data?.secureMedia?.redditVideo?.let { redditVideo ->
-                    redditData?.get(position)?.data?.gifLink = redditVideo.fallbackUrl
+                    redditData?.get(position)?.data?.gifLink = redditVideo.hlsUrl
                     redditData?.get(position)?.data?.shouldUseGlideForGif = false
                     true
                 } ?: run {
-                    redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.url
-                    redditData?.get(position)?.data?.shouldUseGlideForGif = true
-                    redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
+                    redditData?.get(position)?.data?.crossPost?.get(0)?.secureMedia?.redditVideo?.let { redditVideo ->
+                        redditData?.get(position)?.data?.gifLink = redditVideo.hlsUrl
+                        redditData?.get(position)?.data?.shouldUseGlideForGif = false
+                        redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
+                    } ?: run {
+                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.url
+                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                        redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
+                    }
                 }
             } else {
                 false

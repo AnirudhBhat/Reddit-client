@@ -156,18 +156,24 @@ open class FeedAdapter(
 
     suspend fun isItAGifFromGfycat(redditData: MutableList<Children>?, position: Int): Boolean {
         return withContext(ioScope.coroutineContext) {
-            val type = redditData?.get(position)?.data?.secureMedia?.type ?: ""
+            val data = redditData?.get(position)?.data
+            val type = data?.secureMedia?.type ?: ""
             if (type.contains("gfycat")) {
-                redditData?.get(position)?.data?.preview?.redditVideoPreview?.hlsUrl?.let {
-                    redditData?.get(position)?.data?.gifLink = it
-                    redditData?.get(position)?.data?.shouldUseGlideForGif = false
+                data?.preview?.redditVideoPreview?.hlsUrl?.let {
+                    data?.gifLink = it
+                    data?.shouldUseGlideForGif = false
                 } ?: run {
-                    redditData?.get(position)?.data?.crossPost?.get(0)?.secureMedia?.oembed?.let { oembed ->
-                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
-                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
-                    } ?: run {
-                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.secureMedia?.oembed?.thumbnailUrl
-                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
+                    if (data?.crossPost?.size ?: 0 > 0) {
+                        data?.crossPost?.get(0)?.secureMedia?.oembed?.let { oembed ->
+                            data?.gifLink = data?.secureMedia?.oembed?.thumbnailUrl
+                            data?.shouldUseGlideForGif = true
+                        } ?: run {
+                            data?.gifLink = data?.secureMedia?.oembed?.thumbnailUrl
+                            data?.shouldUseGlideForGif = true
+                        }
+                    } else {
+                        data?.gifLink = data?.secureMedia?.oembed?.thumbnailUrl
+                        data?.shouldUseGlideForGif = true
                     }
                 }
                 true
@@ -179,21 +185,28 @@ open class FeedAdapter(
 
     suspend fun isItAGifFromReddit(redditData: MutableList<Children>?, position: Int): Boolean {
         return withContext(ioScope.coroutineContext) {
-            val type = redditData?.get(position)?.data?.secureMedia?.type ?: null
+            val data = redditData?.get(position)?.data
+            val type = data?.secureMedia?.type ?: null
             if (type == null) {
-                redditData?.get(position)?.data?.secureMedia?.redditVideo?.let { redditVideo ->
-                    redditData?.get(position)?.data?.gifLink = redditVideo.hlsUrl
-                    redditData?.get(position)?.data?.shouldUseGlideForGif = false
+                data?.secureMedia?.redditVideo?.let { redditVideo ->
+                    data?.gifLink = redditVideo.hlsUrl
+                    data?.shouldUseGlideForGif = false
                     true
                 } ?: run {
-                    redditData?.get(position)?.data?.crossPost?.get(0)?.secureMedia?.redditVideo?.let { redditVideo ->
-                        redditData?.get(position)?.data?.gifLink = redditVideo.hlsUrl
-                        redditData?.get(position)?.data?.shouldUseGlideForGif = false
-                        redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
-                    } ?: run {
-                        redditData?.get(position)?.data?.gifLink = redditData?.get(position)?.data?.url
-                        redditData?.get(position)?.data?.shouldUseGlideForGif = true
-                        redditData?.get(position)?.data?.url?.contains("v.redd.it") ?: false
+                    if (data?.crossPost?.size ?: 0 > 0) {
+                        data?.crossPost?.get(0)?.secureMedia?.redditVideo?.let { redditVideo ->
+                            data?.gifLink = redditVideo.hlsUrl
+                            data?.shouldUseGlideForGif = false
+                            data?.url?.contains("v.redd.it") ?: false
+                        } ?: run {
+                            data?.gifLink = data?.url
+                            data?.shouldUseGlideForGif = true
+                            data?.url?.contains("v.redd.it") ?: false
+                        }
+                    } else {
+                        data?.gifLink = data?.url
+                        data?.shouldUseGlideForGif = true
+                        data?.url?.contains("v.redd.it") ?: false
                     }
                 }
             } else {

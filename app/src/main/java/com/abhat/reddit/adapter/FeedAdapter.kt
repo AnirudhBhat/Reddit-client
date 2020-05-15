@@ -3,14 +3,12 @@ package com.abhat.reddit.adapter
 import android.content.Intent
 import android.text.Html
 import android.text.format.DateUtils
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import coil.api.load
 import com.abhat.core.PointsFormatter
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
@@ -21,11 +19,13 @@ import com.abhat.reddit.MediaActivity
 import com.abhat.reddit.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import kotlinx.android.synthetic.main.activity_media.view.*
 import kotlinx.android.synthetic.main.activity_reddit_card.view.*
 import kotlinx.coroutines.*
 import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 /**
  * Created by Anirudh Uppunda on 22,April,2020
@@ -325,13 +325,12 @@ open class FeedAdapter(
             over18: Boolean?,
             position: Int
         ) {
-            feedViewModel.isNsfwLiveData.postValue(Pair(over18 ?: false, itemView.nsfw_overlay))
-
             with(itemView) {
                 mainScope.launch {
                     var url: String? = null
                     try {
                         url = selectAppropriateResolution(redditData, position)
+                        redditData?.get(position)?.data?.imageUrl = url
                     } catch (e: ArrayIndexOutOfBoundsException) {
                         e.printStackTrace()
                     }
@@ -454,9 +453,17 @@ open class FeedAdapter(
 //
                 iv_image.setOnClickListener {
                     val intent = Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
+                    val options: ActivityOptionsCompat =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as MainActivity,
+                            (iv_image as View),
+                            "transition_image"
+                        )
+                    intent.putExtra("imageHeight", iv_image.height)
+                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
                     intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
                     intent.putExtra("shoulduseglide", redditData?.get(position)?.data?.shouldUseGlideForGif)
-                    context.startActivity(intent)
+                    context.startActivity(intent, options.toBundle())
                 }
             }
         }

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -52,8 +54,16 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
+        val imageHeight = intent.getIntExtra("imageHeight", 300)
         var url = intent.getStringExtra("url")
+        var imageUrl = intent.getStringExtra("imageUrl")
         var shouldUseGlide = intent.getBooleanExtra("shoulduseglide", false)
+
+        setupClickListeners()
+
+        image.layoutParams.height = imageHeight
+        exoplayer.layoutParams.height = imageHeight
+
         if (url.contains("imgur") && !(url.endsWith(".jpg") || url.endsWith(".png"))) {
             url = url.replace("gifv", "mp4").replace("http:", "https:")
             shouldUseGlide = false
@@ -61,17 +71,34 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         if (shouldUseGlide) {
             image.visibility = View.VISIBLE
             exoplayer.visibility = View.GONE
-            Glide
-                .with(this)
-                .load(url)
-                .into(image)
+            loadImage(url)
         } else {
-            image.visibility = View.GONE
-            exoplayer.visibility = View.VISIBLE
+            loadImage(imageUrl)
             url?.let { url ->
                 prepareExoPlayer()
                 initExoPlayerr(url, exoplayer)
             }
+        }
+    }
+
+    private fun loadImage(url: String) {
+        Glide
+            .with(this)
+            .load(url)
+            .into(image)
+    }
+
+    private fun setupClickListeners() {
+        media_root_layout.setOnClickListener {
+            onBackPressed()
+        }
+
+        image.setOnClickListener {
+            onBackPressed()
+        }
+
+        exoplayer.setOnClickListener {
+            onBackPressed()
         }
 
         volume.setOnClickListener {
@@ -105,17 +132,22 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
     }
 
     fun initExoPlayerr(podcastStreamLink: String, exoPlayer: PlayerView) {
-        exoPlayer.visibility = View.VISIBLE
-        image.visibility = View.GONE
         prepareExoPlayer()
         try {
             player?.addListener(this)
-            Log.d("TAG", "AUDIO URL: $podcastStreamLink")
             val mediaSource =
                 buildMediaSource(Uri.parse(podcastStreamLink))//ExtractorMediaSource(Uri.parse(podcastStreamLink), dataSourceFactory, extractorsFactory, null, null)
             player?.prepare(mediaSource)
             exoPlayer.player = player
             exoPlayer.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            player?.addListener(object : ExoPlayer.EventListener {
+                override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                    if (playbackState == ExoPlayer.STATE_READY) {
+                        image.visibility = View.GONE
+                        exoplayer.visibility = View.VISIBLE
+                    }
+                }
+            })
             player?.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
             player?.playWhenReady = true
         } catch (e: Exception) {
@@ -161,5 +193,11 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         super.onDestroy()
         player?.release()
         player = null
+    }
+
+    override fun onBackPressed() {
+        exoplayer.visibility = View.GONE
+        image.visibility = View.VISIBLE
+        supportFinishAfterTransition()
     }
 }

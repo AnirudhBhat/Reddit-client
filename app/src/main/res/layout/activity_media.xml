@@ -26,9 +26,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:controller_layout_id="@layout/custom_player_ui_layout"
+        app:use_controller="false"
         android:visibility="gone">
 
     </com.google.android.exoplayer2.ui.PlayerView>
+
+    <com.google.android.exoplayer2.ui.PlayerControlView
+        android:id="@+id/controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:controller_layout_id="@layout/custom_player_ui_layout"
+        app:show_timeout="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

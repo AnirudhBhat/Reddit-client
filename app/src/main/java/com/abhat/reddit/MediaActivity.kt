@@ -71,6 +71,7 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         if (shouldUseGlide) {
             image.visibility = View.VISIBLE
             exoplayer.visibility = View.GONE
+            controls.visibility = View.GONE
             loadImage(url)
         } else {
             loadImage(imageUrl)
@@ -118,6 +119,7 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
 
         trackSelector = DefaultTrackSelector(trackSelectionFactory)
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
+        controls.player = player
         // Default parameters, except allowCrossProtocolRedirects is true
         // https://github.com/google/ExoPlayer/issues/423
         val httpDataSourceFactory = DefaultHttpDataSourceFactory(
@@ -197,6 +199,7 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
 
     override fun onBackPressed() {
         exoplayer.visibility = View.GONE
+        controls.visibility = View.GONE
         image.visibility = View.VISIBLE
         supportFinishAfterTransition()
     }

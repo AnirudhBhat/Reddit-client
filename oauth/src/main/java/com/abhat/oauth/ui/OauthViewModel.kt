@@ -8,6 +8,7 @@ import com.abhat.oauth.repository.AccessTokenFetcher
 import com.abhat.core.model.TokenEntity
 import com.abhat.core.model.TokenResponse
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
 
@@ -49,27 +50,29 @@ class OauthViewModel(
     fun retrieveAccessToken(headers: HashMap<String, String>, fields: HashMap<String, String>) {
         currentViewState = currentViewState.copy(isLoading = true)
         viewModelScope.launch(contextProvider.Main) {
-            try {
-                val response =
-                    withContext(viewModelScope.coroutineContext + contextProvider.IO) {
-                        accessTokenFetcher.getAccessToken(
-                            headers,
-                            fields
+            supervisorScope {
+                try {
+                    val response =
+                        withContext(viewModelScope.coroutineContext + contextProvider.IO) {
+                            accessTokenFetcher.getAccessToken(
+                                headers,
+                                fields
+                            )
+                        }
+                    response?.let { tokenResponse ->
+                        currentViewState = currentViewState.copy(
+                            isLoading = false,
+                            success = Success.GotTokenResponse(
+                                tokenResponse
+                            ),
+                            error = null
                         )
                     }
-                response?.let { tokenResponse ->
-                    currentViewState = currentViewState.copy(
-                        isLoading = false,
-                        success = Success.GotTokenResponse(
-                            tokenResponse
-                        ),
-                        error = null
-                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    currentViewState =
+                        currentViewState.copy(isLoading = false, success = null, error = e.cause)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                currentViewState =
-                    currentViewState.copy(isLoading = false, success = null, error = e.cause)
             }
         }
     }

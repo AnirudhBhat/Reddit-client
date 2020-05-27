@@ -33,15 +33,14 @@ class FeedAdapterTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var feedViewModel: FeedViewModel
-    private lateinit var feedRepositoryImpl: FeedRepositoryImpl
+    private lateinit var feedRepositoryImpl: FakeFeedRepositorySuccessResponse
     private lateinit var observer: Observer<Pair<Boolean, RelativeLayout?>>
     private lateinit var feedAdapter: FeedAdapter
 
     @Before
     fun setup() {
-        feedRepositoryImpl = mock()
+        feedRepositoryImpl = FakeFeedRepositorySuccessResponse()
         observer = mock()
-        feedViewModel = mock()
         feedViewModel = FeedViewModel(feedRepositoryImpl, TestContextProvider())
         feedAdapter = FeedAdapter(null, feedViewModel, returnChildren(), TestContextProvider())
     }

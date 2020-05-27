@@ -3,6 +3,7 @@ package com.abhat.reddit.adapter
 import android.content.Intent
 import android.text.Html
 import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -143,7 +144,8 @@ open class FeedAdapter(
             val url = redditData?.get(position)?.data?.url ?: ""
             withContext(mainScope.coroutineContext) {
                 if ((url.endsWith("gifv")
-                        || url.endsWith("gif"))) {
+                            || url.endsWith("gif"))
+                ) {
                     redditData?.get(position)?.data?.shouldUseGlideForGif = true
                     redditData?.get(position)?.data?.gifLink = url
                     true
@@ -327,70 +329,83 @@ open class FeedAdapter(
         ) {
             with(itemView) {
                 mainScope.launch {
-                    var url: String? = null
-                    try {
-                        url = selectAppropriateResolution(redditData, position)
-                        redditData?.get(position)?.data?.imageUrl = url
-                    } catch (e: ArrayIndexOutOfBoundsException) {
-                        e.printStackTrace()
-                    }
-                    url?.let { url ->
-                        iv_image.visibility = View.VISIBLE
-                        Glide.with(context)
-                            .load(url)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .placeholder(R.color.gray_300)
-                            .into(iv_image)
-                    } ?: run {
-                        iv_image.visibility = View.GONE
-                    }
-                    if (over18 == true) {
-                        nsfw_overlay.visibility = View.VISIBLE
-                    } else {
-                        nsfw_overlay.visibility = View.GONE
-                    }
-                    when {
-                        isItAGifFromGfycat(redditData, position) -> {
-                            gif_indicator.visibility = View.VISIBLE
-                            gif_indicator.text = "Gfycat"
-                            gif_indicator.textSize = 12F
-                            video_indicator.visibility = View.GONE
+                    supervisorScope {
+                        launch {
+                            var url: String? = null
+                            try {
+                                url = selectAppropriateResolution(redditData, position)
+                                redditData?.get(position)?.data?.imageUrl = url
+                            } catch (e: ArrayIndexOutOfBoundsException) {
+                                e.printStackTrace()
+                            }
+                            url?.let { url ->
+                                iv_image.visibility = View.VISIBLE
+                                Glide.with(context)
+                                    .load(url)
+                                    .transition(DrawableTransitionOptions.withCrossFade())
+                                    .placeholder(R.color.gray_300)
+                                    .into(iv_image)
+                            } ?: run {
+                                iv_image.visibility = View.GONE
+                            }
                         }
 
-                        isItAGifFromReddit(redditData, position) -> {
-                            gif_indicator.visibility = View.VISIBLE
-                            gif_indicator.text = "Reddit"
-                            gif_indicator.textSize = 12F
-                            video_indicator.visibility = View.GONE
+                        launch {
+                            if (over18 == true) {
+                                nsfw_overlay.visibility = View.VISIBLE
+                            } else {
+                                nsfw_overlay.visibility = View.GONE
+                            }
                         }
 
-                        isItGifFromOtherSource(redditData, position) -> {
-                            gif_indicator.visibility = View.VISIBLE
-                            gif_indicator.text = "GIF"
-                            gif_indicator.textSize = 18F
-                            video_indicator.visibility = View.GONE
+                        launch {
+                            when {
+                                isItAGifFromGfycat(redditData, position) -> {
+                                    gif_indicator.visibility = View.VISIBLE
+                                    gif_indicator.text = "Gfycat"
+                                    gif_indicator.textSize = 12F
+                                    video_indicator.visibility = View.GONE
+                                }
+
+                                isItAGifFromReddit(redditData, position) -> {
+                                    gif_indicator.visibility = View.VISIBLE
+                                    gif_indicator.text = "Reddit"
+                                    gif_indicator.textSize = 12F
+                                    video_indicator.visibility = View.GONE
+                                }
+
+                                isItGifFromOtherSource(redditData, position) -> {
+                                    gif_indicator.visibility = View.VISIBLE
+                                    gif_indicator.text = "GIF"
+                                    gif_indicator.textSize = 18F
+                                    video_indicator.visibility = View.GONE
+                                }
+                                isItAVideo(redditData, position) -> {
+                                    gif_indicator.visibility = View.GONE
+                                    video_indicator.visibility = View.VISIBLE
+                                }
+                                else -> {
+                                    gif_indicator.visibility = View.GONE
+                                    video_indicator.visibility = View.GONE
+                                }
+                            }
                         }
-                        isItAVideo(redditData, position) -> {
-                            gif_indicator.visibility = View.GONE
-                            video_indicator.visibility = View.VISIBLE
+
+                        launch {
+                            if (isItNews(redditData, position) && shouldShowNewsSourceOverlay(
+                                    redditData,
+                                    position
+                                )
+                            ) {
+                                news_source_overlay.visibility = View.VISIBLE
+                                val domainAndSourceUrlPair =
+                                    getNewsDomainAndSourceUrl(redditData, position)
+                                source_url.text = domainAndSourceUrlPair.second
+                                domain.text = domainAndSourceUrlPair.first
+                            } else {
+                                news_source_overlay.visibility = View.GONE
+                            }
                         }
-                        else -> {
-                            gif_indicator.visibility = View.GONE
-                            video_indicator.visibility = View.GONE
-                        }
-                    }
-                    if (isItNews(redditData, position) && shouldShowNewsSourceOverlay(
-                            redditData,
-                            position
-                        )
-                    ) {
-                        news_source_overlay.visibility = View.VISIBLE
-                        val domainAndSourceUrlPair =
-                            getNewsDomainAndSourceUrl(redditData, position)
-                        source_url.text = domainAndSourceUrlPair.second
-                        domain.text = domainAndSourceUrlPair.first
-                    } else {
-                        news_source_overlay.visibility = View.GONE
                     }
                 }
                 loadRestOfTheUI(
@@ -442,17 +457,29 @@ open class FeedAdapter(
 //                selfText.visibility = View.GONE
 //            }
 //
+                val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                    Log.d("TAG", " " + throwable.stackTrace)
+                }
                 author.text = authorString
-                CoroutineScope(CoroutineContextProvider().Main).launch {
-                    points.text = getPoints(pointsString)
-                    comments.text = getComments(commentsString)
-                    created.text = getFormattedDate(Date(createdLong))
+                mainScope.launch(handler) {
+                    supervisorScope {
+                        launch {
+                            points.text = getPoints(pointsString)
+                        }
+                        launch {
+                            comments.text = getComments(commentsString)
+                        }
+                        launch {
+                            created.text = getFormattedDate(Date(createdLong))
+                        }
+                    }
                 }
                 //created.text = dateFormatter(Date(createdLong))
 
 //
                 iv_image.setOnClickListener {
-                    val intent = Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
+                    val intent =
+                        Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
                     val options: ActivityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
                             context as MainActivity,
@@ -462,7 +489,10 @@ open class FeedAdapter(
                     intent.putExtra("imageHeight", iv_image.height)
                     intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
                     intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
-                    intent.putExtra("shoulduseglide", redditData?.get(position)?.data?.shouldUseGlideForGif)
+                    intent.putExtra(
+                        "shoulduseglide",
+                        redditData?.get(position)?.data?.shouldUseGlideForGif
+                    )
                     context.startActivity(intent, options.toBundle())
                 }
             }

@@ -64,6 +64,6 @@ dependencies {
     androidTestImplementation lib.espressocore
     implementation project(path: ':core')
     implementation project(path: ':oauth')
-    implementation project(path: ':feed')
+    api project(path: ':feed')
     implementation("io.coil-kt:coil:0.10.1")
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.TokenEntity
 import com.abhat.core.model.TokenResponse
+import com.abhat.oauth.ui.OauthViewModel
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -28,12 +29,12 @@ class OauthViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var oauthViewModel: com.abhat.oauth.ui.OauthViewModel
-    private lateinit var accessTokenFetcherImpl: com.abhat.oauth.repository.AccessTokenFetcherImpl
+    private lateinit var accessTokenFetcherImpl: FakeAccessTokenFetcher
     private lateinit var observer: Observer<com.abhat.oauth.ui.OauthViewModel.ViewState>
 
     @Before
     fun setup() {
-        accessTokenFetcherImpl = mock()
+        accessTokenFetcherImpl = FakeAccessTokenFetcher()
         observer = mock()
         oauthViewModel =
             com.abhat.oauth.ui.OauthViewModel(accessTokenFetcherImpl,
@@ -51,11 +52,7 @@ class OauthViewModelTest {
 
             oauthViewModel.viewState.observeForever(observer)
 
-            whenever(accessTokenFetcherImpl.getAccessToken(headers, fields)).thenReturn(generateTokenResponse())
-
             oauthViewModel.retrieveAccessToken(headers, fields)
-
-            verify(accessTokenFetcherImpl).getAccessToken(headers, fields)
 
             verify(observer).onChanged(successState)
         }
@@ -72,11 +69,7 @@ class OauthViewModelTest {
 
             oauthViewModel.viewState.observeForever(observer)
 
-            whenever(accessTokenFetcherImpl.getAccessToken(headers, fields)).thenReturn(generateTokenResponse())
-
             oauthViewModel.retrieveAccessToken(headers, fields)
-
-            verify(accessTokenFetcherImpl).getAccessToken(headers, fields)
 
             val inorder = inOrder(observer)
             inorder.verify(observer).onChanged(loadingState)
@@ -85,8 +78,10 @@ class OauthViewModelTest {
     }
 
     @Test
-    fun `show toast message on error while retrieving access token`() {
+    fun `assert failure state on error while retrieving access token`() {
         runBlocking {
+            val fakeAccessTokenFetcherWhichFails = FakeAccessTokenFetcherWhichFails()
+            val oauthViewModel = OauthViewModel(fakeAccessTokenFetcherWhichFails, TestContextProvider())
             val headers = populateHeadersAndFields().first
             val fields = populateHeadersAndFields().second
 
@@ -97,15 +92,15 @@ class OauthViewModelTest {
 
             oauthViewModel.viewState.observeForever(observer)
 
-            whenever(accessTokenFetcherImpl.getAccessToken(headers, fields)).thenThrow(throwable)
-
             oauthViewModel.retrieveAccessToken(headers, fields)
 
-            verify(accessTokenFetcherImpl).getAccessToken(headers, fields)
+            Assert.assertEquals(failureState.error?.message, oauthViewModel.viewState.value?.error?.message)
+            Assert.assertEquals(failureState.isLoading, oauthViewModel.viewState.value?.isLoading)
+            Assert.assertEquals(failureState.success, oauthViewModel.viewState.value?.success)
 
-            val inorder = inOrder(observer)
-            inorder.verify(observer).onChanged(loadingState)
-            inorder.verify(observer).onChanged(failureState)
+//            val inorder = inOrder(observer)
+//            inorder.verify(observer).onChanged(loadingState)
+//            inorder.verify(observer).onChanged(failureState)
         }
     }
 

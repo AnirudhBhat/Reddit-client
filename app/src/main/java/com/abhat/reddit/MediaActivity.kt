@@ -26,6 +26,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.activity_media.*
 import kotlinx.android.synthetic.main.custom_player_ui_layout.*
+import org.koin.android.ext.android.inject
 
 
 /**
@@ -51,6 +52,8 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
 
     private lateinit var trackSelector: DefaultTrackSelector
 
+    private val mediaClassManager: MediaPlayerManager by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
@@ -64,8 +67,8 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         image.layoutParams.height = imageHeight
         exoplayer.layoutParams.height = imageHeight
 
-        if (url.contains("imgur") && !(url.endsWith(".jpg") || url.endsWith(".png"))) {
-            url = url.replace("gifv", "mp4").replace("http:", "https:")
+        if (mediaClassManager.isUrlFromImgurAndIsGif(url)) {
+            url = mediaClassManager.replaceImgurGifUrlWithMp4(url)
             shouldUseGlide = false
         }
         if (shouldUseGlide) {

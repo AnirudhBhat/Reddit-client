@@ -1,18 +1,15 @@
 package com.abhat.comment
 
 import com.abhat.comment.data.CommentsApi
-import com.abhat.comment.data.CommentsRepository
+import com.abhat.comment.data.CommentsRepositoryImpl
 import com.abhat.core.FakeRedditResponse
 import com.abhat.core.model.RedditResponse
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
 
 /**
  * Created by Anirudh Uppunda on 02,June,2020
@@ -21,11 +18,11 @@ class CommentsRepositoryTest {
 
     private lateinit var commentsApi: CommentsApi
 
-    private lateinit var commentsRepository: CommentsRepository
+    private lateinit var commentsRepository: CommentsRepositoryImpl
     @Before
     fun setup() {
         commentsApi = FakeCommentsApi()
-        commentsRepository = CommentsRepository(commentsApi)
+        commentsRepository = CommentsRepositoryImpl(commentsApi)
     }
 
     @Test

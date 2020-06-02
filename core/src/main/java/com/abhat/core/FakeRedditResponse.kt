@@ -46,6 +46,45 @@ object FakeRedditResponse {
         )
     }
 
+    fun returnRedditPostDetailResponse(url: String = "", isVideo: Boolean = false): List<RedditResponse> {
+        return  listOf<RedditResponse>(RedditResponse(
+            kind = "",
+            data = Data(
+                null,
+                null,
+                mutableListOf<Children>(
+                    Children(
+                        prepareAndReturnData(
+                            url = url
+                        ),
+                        "",
+                        1
+                    )
+                ),
+                "",
+                ""
+            )
+        ),
+            RedditResponse(
+                kind = "",
+                data = Data(
+                    null,
+                    null,
+                    mutableListOf<Children>(
+                        Children(
+                            prepareAndReturnData(
+                                url = url
+                            ),
+                            "",
+                            1
+                        )
+                    ),
+                    "",
+                    ""
+                )
+            ))
+    }
+
     private fun prepareAndReturnData(url: String = "",
                                      isVideo: Boolean = false, domain: String = "",
                                      previewSize: Int = 5): ChildrenData {

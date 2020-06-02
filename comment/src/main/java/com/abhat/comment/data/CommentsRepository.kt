@@ -2,9 +2,9 @@ package com.abhat.comment.data
 
 import com.abhat.core.model.RedditResponse
 
-class CommentsRepository(private val commentsApi: CommentsApi) {
-    suspend fun loadPostDetails(subreddit: String, articleUrl: String): List<RedditResponse> {
-        return commentsApi.getPostDetails(subreddit, articleUrl).await()
-    }
-
+/**
+ * Created by Anirudh Uppunda on 02,June,2020
+ */
+interface CommentsRepository {
+    suspend fun loadPostDetails(subreddit: String, articleUrl: String): List<RedditResponse>
 }

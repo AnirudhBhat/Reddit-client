@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.subreddit -> {
+                    //replaceFragment()
+                    true
+                }
+
                 else -> {
                     true
                 }

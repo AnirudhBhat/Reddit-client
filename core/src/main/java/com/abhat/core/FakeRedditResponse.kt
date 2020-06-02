@@ -1,4 +1,4 @@
-package com.abhat.reddit
+package com.abhat.core
 
 import com.abhat.core.model.*
 
@@ -13,7 +13,12 @@ object FakeRedditResponse {
                                previewSize: Int = 5): MutableList<Children> {
         return mutableListOf<Children>(
             Children(
-                prepareAndReturnData(url, isVideo, domain, previewSize),
+                prepareAndReturnData(
+                    url,
+                    isVideo,
+                    domain,
+                    previewSize
+                ),
                 "",
                 1
             )
@@ -28,7 +33,9 @@ object FakeRedditResponse {
                 null,
                 mutableListOf<Children>(
                     Children(
-                        prepareAndReturnData(url = url),
+                        prepareAndReturnData(
+                            url = url
+                        ),
                         "",
                         1
                     )

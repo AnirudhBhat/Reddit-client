@@ -345,9 +345,16 @@ open class FeedAdapter(
                     intent.putExtra("hoursAgo", created.text)
                     intent.putExtra("points", points.text)
                     intent.putExtra("comments", comments.text)
+                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
                     intent.putExtra("articleUrl",
                         redditData?.get(position)?.data?.id
                     )
+                    val options: ActivityOptionsCompat =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as MainActivity,
+                            (redditLayout as View),
+                            "reddit_card"
+                        )
                     context.startActivity(intent)
                 }
             }

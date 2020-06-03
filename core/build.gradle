@@ -41,4 +41,5 @@ dependencies {
     testImplementation lib.junit
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
+    api("io.coil-kt:coil:0.10.1")
 }

@@ -14,6 +14,7 @@
     android:layout_marginTop="8dp"
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="8dp"
+    android:transitionName="reddit_card"
     android:foreground="?attr/selectableItemBackground">
 
         <LinearLayout
@@ -30,7 +31,7 @@
                     android:id="@+id/iv_image"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="fitXY"/>
+                    android:adjustViewBounds="true"/>
 
                 <RelativeLayout
                     android:id="@+id/nsfw_overlay"

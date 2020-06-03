@@ -4,15 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.api.load
 import com.abhat.comment.R
 import com.abhat.core.model.Children
-import com.abhat.core.model.ChildrenData
 import kotlinx.android.synthetic.main.item_card.view.*
 
 /**
  * Created by Anirudh Uppunda on 03,June,2020
  */
-class CommentsAdapter(private val cardData: CardData, private var commentsList: List<Children>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentsAdapter(private val cardData: CardData,
+                      private var commentsList: List<Children>,
+                      private val imageUrl: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
@@ -55,6 +57,7 @@ class CommentsAdapter(private val cardData: CardData, private var commentsList: 
                 created.text = cardData.timeHoursAgo
                 points.text = cardData.points + " Points"
                 comments.text = cardData.comments + " Comments"
+                iv_image.load(imageUrl)
             }
         }
     }

@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.api.load
 import com.abhat.comment.R
 import com.abhat.core.model.Children
 import com.abhat.core.model.ChildrenData
 import com.abhat.core.model.RedditResponse
 import kotlinx.android.synthetic.main.activity_comments.*
+import kotlinx.android.synthetic.main.item_card.*
 import org.koin.android.ext.android.inject
 
 /**
@@ -31,6 +34,7 @@ class CommentsActivity: AppCompatActivity() {
         val points = intent.getStringExtra("points")
         val comments = intent.getStringExtra("comments")
         val articleUrl = intent.getStringExtra("articleUrl")
+        val imageUrl = intent.getStringExtra("imageUrl")
         setupRecyclerView(
             CardData(
                 title,
@@ -39,15 +43,15 @@ class CommentsActivity: AppCompatActivity() {
                 timeHoursAgo,
                 points,
                 comments
-        )
+        ), imageUrl
         )
         observeViewModel()
         commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
     }
 
-    private fun setupRecyclerView(cardData: CardData) {
+    private fun setupRecyclerView(cardData: CardData, imageUrl: String) {
         rv_comments.layoutManager = LinearLayoutManager(this)
-        commentsAdapter = CommentsAdapter(cardData, listOf())
+        commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl)
         rv_comments.adapter = commentsAdapter
     }
 
@@ -61,7 +65,8 @@ class CommentsActivity: AppCompatActivity() {
             uiState.success?.data?.children?.let { children ->
                 printRedditComments(children)
                 commentsAdapter?.updateCommentsList(list)
-                commentsAdapter?.notifyDataSetChanged()
+                commentsAdapter?.notifyItemChanged(1)
+//                rv_comments?.scheduleLayoutAnimation()
             }
             Log.d("TAG", "COMMENT: " + uiState?.success?.data?.children?.get(1)?.data?.body)
         })
@@ -84,7 +89,7 @@ class CommentsActivity: AppCompatActivity() {
 
     private fun getIndent(depth: Int, indent: Int): Int {
         when (depth) {
-            0 -> return 0
+            0 -> return 5
 
             1 -> return 24 + 4
 
@@ -100,5 +105,9 @@ class CommentsActivity: AppCompatActivity() {
 
             else -> return indent + 12
         }
+    }
+
+    override fun onBackPressed() {
+        supportFinishAfterTransition()
     }
 }

@@ -49,5 +49,4 @@ dependencies {
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
     api "androidx.fragment:fragment-ktx:1.2.4"
-    implementation("io.coil-kt:coil:0.10.1")
 }

@@ -28,7 +28,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation lib.kotlin.kotlin_stdlib
-    implementation project(path: ':core')
+    api project(path: ':core')
     implementation lib.appcompat
     implementation lib.corektx
     implementation lib.lifecycleviewmodelktx

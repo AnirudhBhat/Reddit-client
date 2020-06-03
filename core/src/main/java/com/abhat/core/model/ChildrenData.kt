@@ -9,6 +9,7 @@ import com.squareup.moshi.Json
 data class ChildrenData(
     var isGif: Boolean,
     var gifLink: String?,
+    var indent: Int,
     var shouldUseGlideForGif: Boolean = false,
     var imageUrl: String? = null,
     @field:Json(name="over_18")
@@ -56,7 +57,7 @@ data class ChildrenData(
     @field:Json(name = "parent_id")
     val parentId: String,
     @field:Json(name = "replies")
-    val replies: PostDetailResponse?,
+    val replies: RedditResponse?,
     @field:Json(name="score")
     val score:Int,
     @field:Json(name="title")

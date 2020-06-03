@@ -6,7 +6,7 @@ import com.abhat.core.model.RedditResponse
  * Created by Anirudh Uppunda on 02,June,2020
  */
 data class UIState(
-    private val isLoading: Boolean = false,
-    private val success: RedditResponse? = null,
-    private val error: Throwable? = null
+    val isLoading: Boolean = false,
+    val success: RedditResponse? = null,
+    val error: Throwable? = null
 )

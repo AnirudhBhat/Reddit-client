@@ -1,6 +1,7 @@
 package com.abhat.core.common
 
 import com.abhat.core.model.PostDetailResponse
+import com.abhat.core.model.RedditResponse
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
@@ -8,12 +9,12 @@ import com.squareup.moshi.ToJson
 
 class MoshiAdapter{
     @ToJson
-    fun toJson(value: PostDetailResponse?): PostDetailResponse? {
+    fun toJson(value: RedditResponse?): RedditResponse? {
         return value
     }
 
     @FromJson
-    fun fromJson(reader: JsonReader, delegate: JsonAdapter<PostDetailResponse>)= when (reader.peek()) {
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<RedditResponse>)= when (reader.peek()) {
         JsonReader.Token.STRING -> when (reader.nextString()) {
             "" -> null // Response was false
             else ->

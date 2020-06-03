@@ -10,9 +10,11 @@ import com.abhat.core.FakeRedditResponse
 import com.abhat.core.common.CoroutineContextProvider
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,7 +48,6 @@ class CommentsViewModelTest {
         runBlocking {
             commentsViewModel.getUIState().observeForever(postDetailsObserver)
             val loadingTrueState = UIState(isLoading = true, success = null, error = null)
-            val loadingFalseState = UIState(isLoading = false, success = null, error = null)
             val successState = UIState(isLoading = false, success = FakeRedditResponse.returnRedditResponse(), error = null)
 
             commentsViewModel.onAction(Action.LoadPostDetails("subreddit", "article"))
@@ -54,7 +55,25 @@ class CommentsViewModelTest {
             val inOrder  = inOrder(postDetailsObserver)
             inOrder.verify(postDetailsObserver).onChanged(loadingTrueState)
             inOrder.verify(postDetailsObserver).onChanged(successState)
-            inOrder.verify(postDetailsObserver).onChanged(loadingFalseState)
+        }
+    }
+
+    @Test
+    fun `loadPostDetails should show loading, and after failing, return error and  should hide loading`() {
+        runBlocking {
+            val fakeCommentsRepository = FakeCommentsRepository(true)
+            val commentsViewModel = CommentsViewModel(fakeCommentsRepository, TestContextProvider())
+            commentsViewModel.getUIState().observeForever(postDetailsObserver)
+
+            val loadingTrueState = UIState(isLoading = true, success = null, error = null)
+            val failureState = UIState(isLoading = false, success = null, error = RuntimeException("Error!"))
+
+            commentsViewModel.onAction(Action.LoadPostDetails("subreddit", "article"))
+
+            verify(postDetailsObserver).onChanged(loadingTrueState)
+            Assert.assertEquals(failureState.error?.message, commentsViewModel.getUIState()?.value?.error?.message)
+            Assert.assertEquals(failureState.isLoading, commentsViewModel.getUIState()?.value?.isLoading)
+            Assert.assertEquals(failureState.success, commentsViewModel.getUIState()?.value?.success)
         }
     }
 }

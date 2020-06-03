@@ -91,6 +91,7 @@ object FakeRedditResponse {
 
         return ChildrenData(false,
             "",
+            0,
             false,
             "",
             true,

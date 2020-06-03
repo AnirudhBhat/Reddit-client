@@ -37,12 +37,10 @@ class CommentsViewModel(private val commentRepository: CommentsRepository,
                         }
                     response?.let { redditResponseList ->
                         reducer(PostDetailState.Success(response = redditResponseList[1]))
-                        reducer(PostDetailState.Loading(isLoading = false))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     reducer(PostDetailState.Failure(throwable = e.cause))
-                    reducer(PostDetailState.Loading(isLoading = false))
                 }
             }
         }
@@ -52,23 +50,22 @@ class CommentsViewModel(private val commentRepository: CommentsRepository,
         when (action) {
             is Action.LoadPostDetails -> {
                 loadPostDetails(action.subreddit, action.articleUrl)
-                //reducer(loadPostDetails(action.subreddit, action.articleUrl))
             }
         }
     }
 
     private fun reducer(postDetailState: PostDetailState) {
-        when (postDetailState) {
+        currentUIState = when (postDetailState) {
             is PostDetailState.Loading -> {
-                currentUIState = currentUIState.copy(isLoading = postDetailState.isLoading, success = null, error = null)
+                currentUIState.copy(isLoading = postDetailState.isLoading, success = null, error = null)
             }
 
             is PostDetailState.Success -> {
-                currentUIState = currentUIState.copy(isLoading = false, success = postDetailState.response, error = null)
+                currentUIState.copy(isLoading = false, success = postDetailState.response, error = null)
             }
 
             is PostDetailState.Failure -> {
-                currentUIState = currentUIState.copy(isLoading = false, success = null, error = postDetailState.throwable)
+                currentUIState.copy(isLoading = false, success = null, error = postDetailState.throwable)
             }
         }
     }

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.abhat.comment.ui.CommentsActivity
 import com.abhat.core.PointsFormatter
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
@@ -20,7 +21,6 @@ import com.abhat.reddit.MediaActivity
 import com.abhat.reddit.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import kotlinx.android.synthetic.main.activity_media.view.*
 import kotlinx.android.synthetic.main.activity_reddit_card.view.*
 import kotlinx.coroutines.*
 import java.net.URI
@@ -315,6 +315,44 @@ open class FeedAdapter(
     }
 
     inner class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        init {
+            with (itemView) {
+                iv_image.setOnClickListener {
+                    val intent =
+                        Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
+                    val options: ActivityOptionsCompat =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as MainActivity,
+                            (iv_image as View),
+                            "transition_image"
+                        )
+                    intent.putExtra("imageHeight", iv_image.height)
+                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
+                    intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
+                    intent.putExtra(
+                        "shoulduseglide",
+                        redditData?.get(position)?.data?.shouldUseGlideForGif
+                    )
+                    context.startActivity(intent, options.toBundle())
+                }
+
+                reddit_card_layout.setOnClickListener {
+                    val intent = Intent(context, CommentsActivity::class.java)
+                    intent.putExtra("title", title.text)
+                    intent.putExtra("author", author.text)
+                    intent.putExtra("subreddit", subreddit.text)
+                    intent.putExtra("hoursAgo", created.text)
+                    intent.putExtra("points", points.text)
+                    intent.putExtra("comments", comments.text)
+                    intent.putExtra("articleUrl",
+                        redditData?.get(position)?.data?.id
+                    )
+                    context.startActivity(intent)
+                }
+            }
+        }
+
         fun bind(
             titleString: String?,
             authorString: String,
@@ -475,26 +513,6 @@ open class FeedAdapter(
                     }
                 }
                 //created.text = dateFormatter(Date(createdLong))
-
-//
-                iv_image.setOnClickListener {
-                    val intent =
-                        Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
-                    val options: ActivityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as MainActivity,
-                            (iv_image as View),
-                            "transition_image"
-                        )
-                    intent.putExtra("imageHeight", iv_image.height)
-                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
-                    intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
-                    intent.putExtra(
-                        "shoulduseglide",
-                        redditData?.get(position)?.data?.shouldUseGlideForGif
-                    )
-                    context.startActivity(intent, options.toBundle())
-                }
             }
         }
     }

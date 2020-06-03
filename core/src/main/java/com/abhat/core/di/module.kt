@@ -31,8 +31,8 @@ private fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         .build()
 
     return Retrofit.Builder()
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .baseUrl("https://www.reddit.com/")
         .client(okHttpClient)
         .build()

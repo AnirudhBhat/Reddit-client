@@ -21,6 +21,7 @@
         </activity>
         <activity android:name="com.abhat.oauth.ui.OauthActivity"/>
         <activity android:name=".MediaActivity"/>
+        <activity android:name="com.abhat.comment.ui.CommentsActivity"/>
     </application>
 
 </manifest>

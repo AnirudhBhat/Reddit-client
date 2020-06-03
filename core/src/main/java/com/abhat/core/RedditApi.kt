@@ -10,7 +10,7 @@ import retrofit2.http.*
 interface RedditApi {
     @GET("/r/{subreddit}/comments/{article}/.json?sort=top")
     fun getPostDetails(@Path("subreddit") subreddit: String,
-                       @Path("article") article: String): Deferred<List<PostDetailResponse>>
+                       @Path("article") article: String): Deferred<List<RedditResponse>>
 
     @GET("/r/{subreddit}/comments/{article}/.json?sort=top")
     fun getPostDetailsPost(@HeaderMap headers: Map<String, String>,

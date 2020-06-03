@@ -62,8 +62,9 @@ dependencies {
     testImplementation lib.mockitokotlin
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
-    implementation project(path: ':core')
-    implementation project(path: ':oauth')
+    api project(path: ':core')
+    api project(path: ':oauth')
+    api project(path: ':comment')
     api project(path: ':feed')
     implementation("io.coil-kt:coil:0.10.1")
 }

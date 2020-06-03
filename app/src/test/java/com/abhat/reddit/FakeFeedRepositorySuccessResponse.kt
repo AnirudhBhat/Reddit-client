@@ -1,5 +1,6 @@
 package com.abhat.reddit
 
+import com.abhat.core.FakeRedditResponse
 import com.abhat.feed.data.FeedRepository
 import com.abhat.feed.ui.state.FeedViewResult
 

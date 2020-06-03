@@ -9,7 +9,7 @@ import org.koin.dsl.module.module
 /**
  * Created by Anirudh Uppunda on 22,April,2020
  */
-val  feedModule = module {
+val feedModule = module {
     factory { provideFeedViewModel(get(), get()) }
     factory { provideFeedRepository(get()) }
 }

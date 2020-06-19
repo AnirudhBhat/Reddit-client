@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.item_card.view.*
  */
 class CommentsAdapter(private val cardData: CardData,
                       private var commentsList: List<Children>,
-                      private val imageUrl: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                      private val imageUrl: String?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
@@ -57,7 +57,11 @@ class CommentsAdapter(private val cardData: CardData,
                 created.text = cardData.timeHoursAgo
                 points.text = cardData.points + " Points"
                 comments.text = cardData.comments + " Comments"
-                iv_image.load(imageUrl)
+                imageUrl?.let { imageUrl ->
+                    iv_image.load(imageUrl)
+                } ?: run {
+                    iv_image.visibility = View.GONE
+                }
             }
         }
     }

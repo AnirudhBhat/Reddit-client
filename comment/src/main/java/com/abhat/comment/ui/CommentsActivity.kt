@@ -1,7 +1,9 @@
 package com.abhat.comment.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -49,7 +51,7 @@ class CommentsActivity: AppCompatActivity() {
         commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
     }
 
-    private fun setupRecyclerView(cardData: CardData, imageUrl: String) {
+    private fun setupRecyclerView(cardData: CardData, imageUrl: String?) {
         rv_comments.layoutManager = LinearLayoutManager(this)
         commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl)
         rv_comments.adapter = commentsAdapter
@@ -58,11 +60,12 @@ class CommentsActivity: AppCompatActivity() {
     private fun observeViewModel() {
         commentsViewModel.getUIState().observe(this, Observer { uiState ->
             if (uiState.isLoading) {
-
+                pb_comments_activity.visibility = View.VISIBLE
             } else {
 
             }
             uiState.success?.data?.children?.let { children ->
+                pb_comments_activity.visibility = View.GONE
                 printRedditComments(children)
                 commentsAdapter?.updateCommentsList(list)
                 commentsAdapter?.notifyItemChanged(1)
@@ -74,16 +77,18 @@ class CommentsActivity: AppCompatActivity() {
 
     private fun printRedditComments(children: MutableList<Children>) {
         for (children in children) {
-            list.add(children)
-            Log.d("TAG", "COMMENT: " + children.data.body)
-            if (children.data.replies != null) {
-                indent = getIndent(children.data.depth, indent)
-                children.indent = indent
-                printRedditComments((children.data.replies as RedditResponse).data.children)
-            } else {
-                indent = getIndent(children.data.depth, indent)
-                children.indent = indent
-            }
+            //if (!TextUtils.isEmpty(children.data.body)) {
+                list.add(children)
+                Log.d("TAG", "COMMENT: " + children.data.body)
+                if (children.data.replies != null) {
+                    indent = getIndent(children.data.depth, indent)
+                    children.indent = indent
+                    printRedditComments((children.data.replies as RedditResponse).data.children)
+                } else {
+                    indent = getIndent(children.data.depth, indent)
+                    children.indent = indent
+                }
+            //}
         }
     }
 

@@ -372,6 +372,7 @@ class FeedAdapterTest {
 
         return ChildrenData(false,
                 "",
+            0,
             false,
                 "",
                 true,

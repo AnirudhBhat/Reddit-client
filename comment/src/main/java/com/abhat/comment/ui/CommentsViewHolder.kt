@@ -28,85 +28,80 @@ class CommentsViewHolder(private val view: View): RecyclerView.ViewHolder(view) 
     }
 
     fun setMargins(v: ConstraintLayout, l: Int, t: Int, r: Int, b: Int) {
-//        val newLayoutParams =
-//            v.layoutParams as RecyclerView.LayoutParams
-//        newLayoutParams.topMargin = 0
-//        newLayoutParams.leftMargin = l
-//        newLayoutParams.rightMargin = 0
-//        v.layoutParams = newLayoutParams
+        val newLayoutParams =
+            v.layoutParams as RecyclerView.LayoutParams
+        newLayoutParams.topMargin = 0
+        newLayoutParams.leftMargin = l
+        newLayoutParams.rightMargin = 0
+        v.layoutParams = newLayoutParams
+        view.vertical_divider_1.visibility = View.VISIBLE
 
 
-        when (l) {
-            5 -> {
-                view.horizontal_divider.visibility = View.VISIBLE
-                view.vertical_divider_1.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.GONE
-                view.vertical_divider_3.visibility = View.GONE
-                view.vertical_divider_4.visibility = View.GONE
-                view.vertical_divider_5.visibility = View.GONE
-                view.vertical_divider_6.visibility = View.GONE
-            }
-
-            28 -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.GONE
-                view.vertical_divider_4.visibility = View.GONE
-                view.vertical_divider_5.visibility = View.GONE
-                view.vertical_divider_6.visibility = View.GONE
-            }
-
-            40 -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.VISIBLE
-                view.vertical_divider_4.visibility = View.GONE
-                view.vertical_divider_5.visibility = View.GONE
-                view.vertical_divider_6.visibility = View.GONE
-            }
-
-            52 -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.VISIBLE
-                view.vertical_divider_4.visibility = View.VISIBLE
-                view.vertical_divider_5.visibility = View.GONE
-                view.vertical_divider_6.visibility = View.GONE
-            }
-
-            64 -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.VISIBLE
-                view.vertical_divider_4.visibility = View.VISIBLE
-                view.vertical_divider_5.visibility = View.VISIBLE
-                view.vertical_divider_6.visibility = View.GONE
-            }
-
-            76 -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.VISIBLE
-                view.vertical_divider_4.visibility = View.VISIBLE
-                view.vertical_divider_5.visibility = View.VISIBLE
-                view.vertical_divider_6.visibility = View.VISIBLE
-            }
-
-            else -> {
-//                view.vertical_divider_1.visibility = View.VISIBLE
-                view.horizontal_divider.visibility = View.GONE
-                view.vertical_divider_2.visibility = View.VISIBLE
-                view.vertical_divider_3.visibility = View.VISIBLE
-                view.vertical_divider_4.visibility = View.VISIBLE
-                view.vertical_divider_5.visibility = View.VISIBLE
-                view.vertical_divider_6.visibility = View.VISIBLE
-            }
-
-        }
+//        when (l) {
+//            5 -> {
+//                view.horizontal_divider.visibility = View.VISIBLE
+//                view.vertical_divider_1.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.GONE
+//                view.vertical_divider_3.visibility = View.GONE
+//                view.vertical_divider_4.visibility = View.GONE
+//                view.vertical_divider_5.visibility = View.GONE
+//                view.vertical_divider_6.visibility = View.GONE
+//            }
+//
+//            28 -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.GONE
+//                view.vertical_divider_4.visibility = View.GONE
+//                view.vertical_divider_5.visibility = View.GONE
+//                view.vertical_divider_6.visibility = View.GONE
+//            }
+//
+//            40 -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.VISIBLE
+//                view.vertical_divider_4.visibility = View.GONE
+//                view.vertical_divider_5.visibility = View.GONE
+//                view.vertical_divider_6.visibility = View.GONE
+//            }
+//
+//            52 -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.VISIBLE
+//                view.vertical_divider_4.visibility = View.VISIBLE
+//                view.vertical_divider_5.visibility = View.GONE
+//                view.vertical_divider_6.visibility = View.GONE
+//            }
+//
+//            64 -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.VISIBLE
+//                view.vertical_divider_4.visibility = View.VISIBLE
+//                view.vertical_divider_5.visibility = View.VISIBLE
+//                view.vertical_divider_6.visibility = View.GONE
+//            }
+//
+//            76 -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.VISIBLE
+//                view.vertical_divider_4.visibility = View.VISIBLE
+//                view.vertical_divider_5.visibility = View.VISIBLE
+//                view.vertical_divider_6.visibility = View.VISIBLE
+//            }
+//
+//            else -> {
+//                view.horizontal_divider.visibility = View.GONE
+//                view.vertical_divider_2.visibility = View.VISIBLE
+//                view.vertical_divider_3.visibility = View.VISIBLE
+//                view.vertical_divider_4.visibility = View.VISIBLE
+//                view.vertical_divider_5.visibility = View.VISIBLE
+//                view.vertical_divider_6.visibility = View.VISIBLE
+//            }
+//
+//        }
     }
 }

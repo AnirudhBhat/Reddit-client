@@ -59,7 +59,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        feedViewModel.feedViewState.observe(this, Observer { feedViewState ->
+        feedViewModel.feedViewState.observe(activity as MainActivity, Observer { feedViewState ->
             setProgressBarVisibility(feedViewState)
             if (!feedViewState.isLoading) {
                 if (anyError(feedViewState)) {
@@ -109,7 +109,7 @@ class FeedFragment : Fragment() {
         feedRecyclerView = itemView.findViewById(R.id.feed_recycler_view)
         layoutManager = LinearLayoutManager(activity)
         feedRecyclerView?.layoutManager = layoutManager
-        feedAdapter = FeedAdapter(activity!!, feedViewModel, null, CoroutineContextProvider())
+        feedAdapter = FeedAdapter(activity as MainActivity, feedViewModel, null, CoroutineContextProvider())
         feedRecyclerView?.adapter = feedAdapter
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {

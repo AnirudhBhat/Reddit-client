@@ -32,11 +32,11 @@ import java.util.*
  * Created by Anirudh Uppunda on 22,April,2020
  */
 open class FeedAdapter(
-    private val context: FragmentActivity? = null,
+    private val context: MainActivity? = null,
     private val feedViewModel: FeedViewModel,
     private var redditData: MutableList<Children>? = null,
     private val contextProvider: CoroutineContextProvider
-) : RecyclerView.Adapter<FeedAdapter.FeedViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var view: FeedViewHolder? = null
     private var feedAdapterController: FeedAdapterController? = null
@@ -44,14 +44,22 @@ open class FeedAdapter(
     private val ioScope = CoroutineScope(contextProvider.IO + SupervisorJob())
     private val mainScope = CoroutineScope(contextProvider.Main + SupervisorJob())
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)
-        view = FeedViewHolder(layoutInflater.inflate(R.layout.activity_reddit_card, parent, false))
-        return view as FeedViewHolder
+        if (viewType == 0) {
+            return TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), context )
+        } else {
+            view = FeedViewHolder(layoutInflater.inflate(R.layout.activity_reddit_card, parent, false))
+            return view as FeedViewHolder
+        }
     }
 
     override fun getItemCount(): Int {
         return redditData?.size ?: 0
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     fun updateRedditData(redditData: MutableList<Children>?) {
@@ -66,21 +74,25 @@ open class FeedAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
-        ioScope.async {
-            val title = redditData?.get(position)?.data?.title ?: ""
-            val author = redditData?.get(position)?.data?.author ?: ""
-            val points = redditData?.get(position)?.data?.score?.toString() ?: ""
-            val comments = redditData?.get(position)?.data?.numComments?.toString() ?: ""
-            val subreddit = redditData?.get(position)?.data?.subreddit ?: ""
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (position == 0) {
+            (holder as TrendingAndSortViewHolder).bind()
+        } else {
+            ioScope.async {
+                val title = redditData?.get(position)?.data?.title ?: ""
+                val author = redditData?.get(position)?.data?.author ?: ""
+                val points = redditData?.get(position)?.data?.score?.toString() ?: ""
+                val comments = redditData?.get(position)?.data?.numComments?.toString() ?: ""
+                val subreddit = redditData?.get(position)?.data?.subreddit ?: ""
 //        val bodyHtml = redditData?.children?.get(position)?.data?.bodyHtml ?: ""
-            val created = redditData?.get(position)?.data?.createdUtc?.times(1000) ?: 0
-            val over18 = redditData?.get(position)?.data?.over18 ?: false
-            withContext(contextProvider.Main) {
-                holder.bind(
-                    title, author, points, comments, subreddit, "",
-                    created, "", over18, position
-                )
+                val created = redditData?.get(position)?.data?.createdUtc?.times(1000) ?: 0
+                val over18 = redditData?.get(position)?.data?.over18 ?: false
+                withContext(contextProvider.Main) {
+                    (holder as FeedViewHolder).bind(
+                        title, author, points, comments, subreddit, "",
+                        created, "", over18, position
+                    )
+                }
             }
         }
 

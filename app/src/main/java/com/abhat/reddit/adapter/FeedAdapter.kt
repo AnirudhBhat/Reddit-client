@@ -16,6 +16,7 @@ import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
 import com.abhat.feed.ui.FeedAdapterController
 import com.abhat.feed.ui.FeedViewModel
+import com.abhat.reddit.FeedFragment
 import com.abhat.reddit.MainActivity
 import com.abhat.reddit.MediaActivity
 import com.abhat.reddit.R
@@ -33,6 +34,7 @@ import java.util.*
  */
 open class FeedAdapter(
     private val context: MainActivity? = null,
+    private val fragment: FeedFragment? = null,
     private val feedViewModel: FeedViewModel,
     private var redditData: MutableList<Children>? = null,
     private val contextProvider: CoroutineContextProvider
@@ -47,7 +49,7 @@ open class FeedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)
         if (viewType == 0) {
-            return TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), context )
+            return TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), fragment )
         } else {
             view = FeedViewHolder(layoutInflater.inflate(R.layout.activity_reddit_card, parent, false))
             return view as FeedViewHolder

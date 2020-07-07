@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.ui.FeedViewModel
 import com.abhat.feed.ui.state.FeedViewState
+import com.abhat.reddit.SortType.SortType
 import com.abhat.reddit.adapter.FeedAdapter
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
@@ -109,7 +110,7 @@ class FeedFragment : Fragment() {
         feedRecyclerView = itemView.findViewById(R.id.feed_recycler_view)
         layoutManager = LinearLayoutManager(activity)
         feedRecyclerView?.layoutManager = layoutManager
-        feedAdapter = FeedAdapter(activity as MainActivity, feedViewModel, null, CoroutineContextProvider())
+        feedAdapter = FeedAdapter(activity as MainActivity, this, feedViewModel, null, CoroutineContextProvider())
         feedRecyclerView?.adapter = feedAdapter
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -134,5 +135,34 @@ class FeedFragment : Fragment() {
 
     private fun showErrorToast(message: String) {
         Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun returnSortTypeListWithoutBestOption(): List<SortType> {
+        return listOf(
+            SortType.Hot,
+            SortType.New,
+            SortType.Rising
+        )
+    }
+
+    private fun returnSortTypeList(): List<SortType> {
+        return listOf(
+            SortType.Best,
+            SortType.Hot,
+            SortType.New,
+            SortType.Rising
+        )
+    }
+
+    fun openSortBottomSheet() {
+        val sortBottomSheet = SortBottomSheet()
+        if (feedViewModel.shouldShowBestOptionInSortList(SUBREDDIT)) {
+            sortBottomSheet.sortTypeList = returnSortTypeList()
+        } else {
+            sortBottomSheet.sortTypeList = returnSortTypeListWithoutBestOption()
+        }
+        activity?.supportFragmentManager?.let {
+            sortBottomSheet.show(it, "sort_bottom_sheet")
+        }
     }
 }

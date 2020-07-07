@@ -42,7 +42,7 @@ class FeedAdapterTest {
         feedRepositoryImpl = FakeFeedRepositorySuccessResponse()
         observer = mock()
         feedViewModel = FeedViewModel(feedRepositoryImpl, TestContextProvider())
-        feedAdapter = FeedAdapter(null, feedViewModel, returnChildren(), TestContextProvider())
+        feedAdapter = FeedAdapter(null, null, feedViewModel, returnChildren(), TestContextProvider())
     }
 
     @Test

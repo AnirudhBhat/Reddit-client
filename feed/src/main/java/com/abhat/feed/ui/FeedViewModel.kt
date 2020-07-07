@@ -75,4 +75,8 @@ open class FeedViewModel(
             }
         }
     }
+
+    fun shouldShowBestOptionInSortList(subreddit: String? = null): Boolean {
+        return subreddit == null || subreddit.isEmpty()
+    }
 }

@@ -44,9 +44,4 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.container, fragment, "general")
             .commitAllowingStateLoss()
     }
-
-    fun openSortBottomSheet() {
-        val sortBottomSheet = SortBottomSheet()
-        sortBottomSheet.show(supportFragmentManager, "sort_bottom_sheet")
-    }
 }

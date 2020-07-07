@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_sort_bottomsheet_layout.*
  */
 class SortBottomSheet: BottomSheetDialogFragment() {
 
-    private val sortTypeList = listOf(
+    var sortTypeList = listOf(
         SortType.Best,
         SortType.Hot,
         SortType.New,

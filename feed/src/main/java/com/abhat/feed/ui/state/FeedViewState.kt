@@ -1,5 +1,6 @@
 package com.abhat.feed.ui.state
 
+import com.abhat.core.SortType.SortType
 import com.abhat.core.model.Children
 import com.abhat.core.model.RedditResponse
 
@@ -9,6 +10,8 @@ import com.abhat.core.model.RedditResponse
 data class FeedViewState(
     val isLoading: Boolean = false,
     val feedList: RedditResponse? = null,
+    val sortType: SortType = SortType.hot,
+    val sortList: List<SortType> = listOf(SortType.hot, SortType.new, SortType.rising),
     val error: Throwable? = null,
     val authorizationError: Throwable? = null
 )

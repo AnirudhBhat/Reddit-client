@@ -1,6 +1,7 @@
 package com.abhat.feed.data
 
 import com.abhat.core.RedditApi
+import com.abhat.core.SortType.SortType
 import com.abhat.feed.ui.state.FeedViewResult
 import retrofit2.HttpException
 
@@ -9,9 +10,9 @@ import retrofit2.HttpException
  */
 open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository {
 
-    override suspend fun getFeed(subreddit: String, after: String): FeedViewResult? {
+    override suspend fun getFeed(subreddit: String, after: String, sortType: SortType): FeedViewResult? {
         try {
-            val response = redditApi.getRedditList(subreddit, after).await()
+            val response = redditApi.getRedditList(subreddit, sortType, after).await()
             return FeedViewResult.Success(response)
         } catch (e: Exception) {
             return if (e is HttpException) {

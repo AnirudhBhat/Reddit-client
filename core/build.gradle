@@ -33,6 +33,7 @@ dependencies {
     implementation lib.moshiconverter
     implementation lib.coroutinesandroid
     implementation lib.coroutinesadapter
+    implementation lib.retrofitgsonconverter
     implementation lib.koinandroid
     implementation lib.koinviewmodel
     implementation lib.retrofitlogging

@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.abhat.comment.ui.CommentsActivity
 import com.abhat.core.PointsFormatter
+import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
 import com.abhat.feed.ui.FeedAdapterController
@@ -41,6 +42,7 @@ open class FeedAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var view: FeedViewHolder? = null
+    private var trendingAndSortViewHolder: TrendingAndSortViewHolder? = null
     private var feedAdapterController: FeedAdapterController? = null
     private var gifUrl: String? = null
     private val ioScope = CoroutineScope(contextProvider.IO + SupervisorJob())
@@ -49,7 +51,8 @@ open class FeedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)
         if (viewType == 0) {
-            return TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), fragment )
+            trendingAndSortViewHolder =  TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), fragment)
+            return trendingAndSortViewHolder as TrendingAndSortViewHolder
         } else {
             view = FeedViewHolder(layoutInflater.inflate(R.layout.activity_reddit_card, parent, false))
             return view as FeedViewHolder
@@ -64,12 +67,14 @@ open class FeedAdapter(
         return position
     }
 
-    fun updateRedditData(redditData: MutableList<Children>?) {
+    fun updateRedditData(redditData: MutableList<Children>?, sortType: SortType) {
         this.redditData = redditData
+        trendingAndSortViewHolder?.sortType = sortType
         notifyDataSetChanged()
     }
 
-    fun addRedditData(redditData: List<Children>?) {
+    fun addRedditData(redditData: List<Children>?, sortType: SortType) {
+        trendingAndSortViewHolder?.sortType = sortType
         redditData?.let { redditData ->
             this.redditData?.addAll(redditData)
             notifyItemChanged(redditData.size)

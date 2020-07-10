@@ -1,5 +1,6 @@
 package com.abhat.core
 
+import com.abhat.core.SortType.SortType
 import com.abhat.core.model.PostDetailResponse
 import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
@@ -18,8 +19,10 @@ interface RedditApi {
                        @Path("article") article: String): Deferred<List<PostDetailResponse>>
 
 
-    @GET("/r/{subreddit}/.json")
-    fun getRedditList(@Path("subreddit") subreddit: String, @Query("after") after: String = ""): Deferred<RedditResponse>
+    @GET("/r/{subreddit}/{sortType}.json")
+    fun getRedditList(@Path("subreddit") subreddit: String,
+                      @Path("sortType") sortType: SortType,
+                      @Query("after") after: String = ""): Deferred<RedditResponse>
 
     @GET("/r/{subreddit}/.json")
     fun getRedditListPost(@HeaderMap headers: Map<String, String>,

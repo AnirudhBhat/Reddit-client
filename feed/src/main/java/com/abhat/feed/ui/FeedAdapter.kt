@@ -1,4 +1,4 @@
-package com.abhat.reddit.adapter
+package com.abhat.feed.ui
 
 import android.content.Intent
 import android.text.Html
@@ -10,17 +10,11 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.abhat.comment.ui.CommentsActivity
 import com.abhat.core.PointsFormatter
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.Children
-import com.abhat.feed.ui.FeedAdapterController
-import com.abhat.feed.ui.FeedViewModel
-import com.abhat.reddit.FeedFragment
-import com.abhat.reddit.MainActivity
-import com.abhat.reddit.MediaActivity
-import com.abhat.reddit.R
+import com.abhat.feed.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.activity_reddit_card.view.*
@@ -34,7 +28,7 @@ import java.util.*
  * Created by Anirudh Uppunda on 22,April,2020
  */
 open class FeedAdapter(
-    private val context: MainActivity? = null,
+    private val context: FragmentActivity? = null,
     private val fragment: FeedFragment? = null,
     private val feedViewModel: FeedViewModel,
     private var redditData: MutableList<Children>? = null,
@@ -339,10 +333,10 @@ open class FeedAdapter(
             with (itemView) {
                 iv_image.setOnClickListener {
                     val intent =
-                        Intent(this@FeedAdapter.context as MainActivity, MediaActivity::class.java)
+                        Intent(this@FeedAdapter.context, MediaActivity::class.java)
                     val options: ActivityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as MainActivity,
+                            context as FragmentActivity,
                             (iv_image as View),
                             "transition_image"
                         )
@@ -357,7 +351,9 @@ open class FeedAdapter(
                 }
 
                 reddit_card_layout.setOnClickListener {
-                    val intent = Intent(context, CommentsActivity::class.java)
+//                    val intent = Intent(context, CommentsActivity::class.java)
+                    val intent = Intent()
+                    intent.setClassName(context, "com.abhat.comment.ui.CommentsActivity")
                     intent.putExtra("title", title.text)
                     intent.putExtra("author", author.text)
                     intent.putExtra("subreddit", subreddit.text)
@@ -368,12 +364,6 @@ open class FeedAdapter(
                     intent.putExtra("articleUrl",
                         redditData?.get(position)?.data?.id
                     )
-                    val options: ActivityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as MainActivity,
-                            (redditLayout as View),
-                            "reddit_card"
-                        )
                     context.startActivity(intent)
                 }
             }

@@ -1,5 +1,6 @@
-package com.abhat.reddit
+package com.abhat.feed
 
+import com.abhat.feed.ui.MediaPlayerManager
 import org.junit.Assert
 import org.junit.Test
 

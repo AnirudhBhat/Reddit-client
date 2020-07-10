@@ -4,6 +4,7 @@ import com.abhat.comment.data.CommentsApi
 import com.abhat.comment.data.CommentsRepositoryImpl
 import com.abhat.core.FakeRedditResponse
 import com.abhat.core.RedditApi
+import com.abhat.core.SortType.SortType
 import com.abhat.core.model.PostDetailResponse
 import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
@@ -56,7 +57,7 @@ class CommentsRepositoryTest {
             TODO("Not yet implemented")
         }
 
-        override fun getRedditList(subreddit: String, after: String): Deferred<RedditResponse> {
+        override fun getRedditList(subreddit: String, sortType: SortType, after: String): Deferred<RedditResponse> {
             TODO("Not yet implemented")
         }
 

@@ -1,20 +1,13 @@
-package com.abhat.reddit
+package com.abhat.feed
 
 import android.widget.RelativeLayout
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.*
-import com.abhat.feed.data.FeedRepositoryImpl
 import com.abhat.feed.ui.FeedViewModel
-import com.abhat.feed.ui.state.FeedViewResult
-import com.abhat.feed.ui.state.FeedViewState
-import com.abhat.reddit.adapter.FeedAdapter
-import com.nhaarman.mockitokotlin2.any
+import com.abhat.feed.ui.FeedAdapter
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -22,7 +15,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.internal.matchers.Any
 
 /**
  * Created by Anirudh Uppunda on 09,May,2020
@@ -41,8 +33,16 @@ class FeedAdapterTest {
     fun setup() {
         feedRepositoryImpl = FakeFeedRepositorySuccessResponse()
         observer = mock()
-        feedViewModel = FeedViewModel(feedRepositoryImpl, TestContextProvider())
-        feedAdapter = FeedAdapter(null, null, feedViewModel, returnChildren(), TestContextProvider())
+        feedViewModel = FeedViewModel(feedRepositoryImpl,
+            TestContextProvider()
+        )
+        feedAdapter = FeedAdapter(
+            null,
+            null,
+            feedViewModel,
+            returnChildren(),
+            TestContextProvider()
+        )
     }
 
     @Test

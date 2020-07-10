@@ -1,16 +1,14 @@
-package com.abhat.reddit
+package com.abhat.feed.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.abhat.feed.ui.FeedViewModel
 import com.abhat.core.SortType.SortType
-import com.abhat.reddit.adapter.SortAdapter
+import com.abhat.feed.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_sort_bottomsheet_layout.*
-import org.koin.android.ext.android.inject
 
 /**
  * Created by Anirudh Uppunda on 06,July,2020
@@ -44,7 +42,12 @@ class SortBottomSheet: BottomSheetDialogFragment() {
 
     fun setupRecyclerView() {
         rv_sort.layoutManager = LinearLayoutManager(activity)
-        rv_sort.adapter = SortAdapter(sortTypeList, feedFragment, subreddit, this)
+        rv_sort.adapter = SortAdapter(
+            sortTypeList,
+            feedFragment,
+            subreddit,
+            this
+        )
     }
 
 }

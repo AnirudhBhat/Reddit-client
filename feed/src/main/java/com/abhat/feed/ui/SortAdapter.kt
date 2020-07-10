@@ -1,15 +1,11 @@
-package com.abhat.reddit.adapter
+package com.abhat.feed.ui
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.abhat.reddit.R
 import com.abhat.core.SortType.SortType
-import com.abhat.feed.ui.FeedViewModel
-import com.abhat.reddit.FeedFragment
-import com.abhat.reddit.SortBottomSheet
+import com.abhat.feed.R
 import kotlinx.android.synthetic.main.item_sort_bottom_sheet.view.*
 
 /**

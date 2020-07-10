@@ -1,9 +1,8 @@
-package com.abhat.reddit.adapter
+package com.abhat.feed.ui
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
-import com.abhat.reddit.FeedFragment
 import kotlinx.android.synthetic.main.item_trending_and_sort.view.*
 
 /**

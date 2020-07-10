@@ -1,4 +1,4 @@
-package com.abhat.reddit
+package com.abhat.feed.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,17 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
-import com.abhat.feed.ui.FeedViewModel
+import com.abhat.feed.R
 import com.abhat.feed.ui.state.FeedViewState
-import com.abhat.reddit.adapter.FeedAdapter
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
 
@@ -66,7 +62,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        feedViewModel.feedViewState.observe(activity as MainActivity, Observer { feedViewState ->
+        feedViewModel.feedViewState.observe(requireActivity(), Observer { feedViewState ->
             currentFeedUiState = feedViewState
             setProgressBarVisibility(feedViewState)
             if (!feedViewState.isLoading) {
@@ -117,7 +113,7 @@ class FeedFragment : Fragment() {
         feedRecyclerView = itemView.findViewById(R.id.feed_recycler_view)
         layoutManager = LinearLayoutManager(activity)
         feedRecyclerView?.layoutManager = layoutManager
-        feedAdapter = FeedAdapter(activity as MainActivity, this, feedViewModel, null, CoroutineContextProvider())
+        feedAdapter = FeedAdapter(activity, this, feedViewModel, null, CoroutineContextProvider())
         feedRecyclerView?.adapter = feedAdapter
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {

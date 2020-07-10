@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "kotlin-kapt"
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -40,6 +41,9 @@ dependencies {
     implementation lib.retrofit
     implementation lib.retrofitgsonconverter
     implementation lib.retrofitlogging
+    implementation lib.glide
+    kapt lib.glidecompiler
+    implementation lib.exoplayer
     implementation lib.koinandroid
     implementation lib.koinviewmodel
     implementation lib.material

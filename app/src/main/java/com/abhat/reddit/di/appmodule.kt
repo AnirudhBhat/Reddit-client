@@ -1,6 +1,6 @@
 package com.abhat.reddit.di
 
-import com.abhat.reddit.MediaPlayerManager
+import com.abhat.feed.ui.MediaPlayerManager
 import org.koin.dsl.module.module
 
 /**

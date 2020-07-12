@@ -24,14 +24,19 @@ interface RedditApi {
                       @Path("sortType") sortType: SortType,
                       @Query("after") after: String = ""): Deferred<RedditResponse>
 
+    @GET("{sortType}/.json")
+    fun getRedditFrontPage(
+        @Path("sortType") sortType: String,
+        @Query("after") after: String = ""): Deferred<RedditResponse>
+
     @GET("/r/{subreddit}/.json")
     fun getRedditListPost(@HeaderMap headers: Map<String, String>,
                           @Path("subreddit") subreddit: String,
                           @Query("after") after: String = ""): Deferred<PostDetailResponse>
 
-    @GET("hot.json?")
-    fun getRedditFrontPage(@HeaderMap headers: Map<String, String>,
-                          @Query("after") after: String = ""): Deferred<PostDetailResponse>
+//    @GET("hot.json?")
+//    fun getRedditFrontPage(@HeaderMap headers: Map<String, String>,
+//                          @Query("after") after: String = ""): Deferred<PostDetailResponse>
 
     @FormUrlEncoded
     @POST("api/v1/access_token/")

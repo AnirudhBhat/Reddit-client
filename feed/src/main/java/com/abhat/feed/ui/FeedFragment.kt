@@ -24,7 +24,7 @@ class FeedFragment : Fragment() {
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var feedAdapter: FeedAdapter? = null
     private var after: String = ""
-    private val SUBREDDIT = "all"
+    private val SUBREDDIT = ""
     private var isFromSubreddit: Boolean? = null
 
     private var loading = false
@@ -70,7 +70,7 @@ class FeedFragment : Fragment() {
             setupRecyclerView(view)
             observeViewModel()
             feedViewModel.showProgressBar()
-            feedViewModel.getFeed(SUBREDDIT, after)
+            feedViewModel.getFeed(SUBREDDIT, after, SortType.empty)
 //        }
         return view
     }

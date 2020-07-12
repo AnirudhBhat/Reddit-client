@@ -196,7 +196,7 @@ class FeedViewModelTest {
             error = feedViewResult.throwable
         )
         feedViewModel.feedViewState.observeForever(feedObserver)
-        feedViewModel.getFeed(subreddit = "all", after = "")
+        feedViewModel.getFeed(subreddit = "all", after = "", sortType = SortType.hot)
 
         val inOrder = inOrder(feedObserver)
         inOrder.verify(feedObserver).onChanged(loadingState)

@@ -35,17 +35,21 @@ class SortAdapter(private val sortList: List<SortType>,
                 tv_sort_by.text = sortList[adapterPosition].name
                 tv_sort_by.setOnClickListener {
                     feedFragment?.showProgressBar()
-                    when (adapterPosition) {
-                        0 -> {
+                    when (tv_sort_by.text) {
+                        "hot" -> {
                             feedFragment?.getFeed(subreddit, after, SortType.hot)
                         }
 
-                        1 -> {
+                        "new" -> {
                             feedFragment?.getFeed(subreddit, after, SortType.new)
                         }
 
-                        2 -> {
+                        "rising" -> {
                             feedFragment?.getFeed(subreddit, after, SortType.rising)
+                        }
+
+                        "best" -> {
+                            feedFragment?.getFeed(subreddit, after, SortType.best)
                         }
                     }
                     sortBottomSheet.dismiss()

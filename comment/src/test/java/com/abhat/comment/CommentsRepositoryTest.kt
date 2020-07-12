@@ -15,6 +15,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
+import retrofit2.http.Path
 
 /**
  * Created by Anirudh Uppunda on 02,June,2020
@@ -70,9 +71,9 @@ class CommentsRepositoryTest {
         }
 
         override fun getRedditFrontPage(
-            headers: Map<String, String>,
+            @Path("sortType") sortType: String,
             after: String
-        ): Deferred<PostDetailResponse> {
+        ): Deferred<RedditResponse> {
             TODO("Not yet implemented")
         }
 

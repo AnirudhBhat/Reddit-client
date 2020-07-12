@@ -80,18 +80,18 @@ open class FeedAdapter(
             (holder as TrendingAndSortViewHolder).bind()
         } else {
             ioScope.async {
-                val title = redditData?.get(position)?.data?.title ?: ""
-                val author = redditData?.get(position)?.data?.author ?: ""
-                val points = redditData?.get(position)?.data?.score?.toString() ?: ""
-                val comments = redditData?.get(position)?.data?.numComments?.toString() ?: ""
-                val subreddit = redditData?.get(position)?.data?.subreddit ?: ""
-//        val bodyHtml = redditData?.children?.get(position)?.data?.bodyHtml ?: ""
-                val created = redditData?.get(position)?.data?.createdUtc?.times(1000) ?: 0
-                val over18 = redditData?.get(position)?.data?.over18 ?: false
+                val title = redditData?.get(position - 1)?.data?.title ?: ""
+                val author = redditData?.get(position - 1)?.data?.author ?: ""
+                val points = redditData?.get(position - 1)?.data?.score?.toString() ?: ""
+                val comments = redditData?.get(position - 1)?.data?.numComments?.toString() ?: ""
+                val subreddit = redditData?.get(position - 1)?.data?.subreddit ?: ""
+//        val bodyHtml = redditData?.children?.get(position - 1)?.data?.bodyHtml ?: ""
+                val created = redditData?.get(position - 1)?.data?.createdUtc?.times(1000) ?: 0
+                val over18 = redditData?.get(position - 1)?.data?.over18 ?: false
                 withContext(contextProvider.Main) {
                     (holder as FeedViewHolder).bind(
                         title, author, points, comments, subreddit, "",
-                        created, "", over18, position
+                        created, "", over18, position - 1
                     )
                 }
             }
@@ -341,11 +341,11 @@ open class FeedAdapter(
                             "transition_image"
                         )
                     intent.putExtra("imageHeight", iv_image.height)
-                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
-                    intent.putExtra("url", redditData?.get(position)?.data?.gifLink)
+                    intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
+                    intent.putExtra("url", redditData?.get(position - 1)?.data?.gifLink)
                     intent.putExtra(
                         "shoulduseglide",
-                        redditData?.get(position)?.data?.shouldUseGlideForGif
+                        redditData?.get(position - 1)?.data?.shouldUseGlideForGif
                     )
                     context.startActivity(intent, options.toBundle())
                 }
@@ -360,9 +360,9 @@ open class FeedAdapter(
                     intent.putExtra("hoursAgo", created.text)
                     intent.putExtra("points", points.text)
                     intent.putExtra("comments", comments.text)
-                    intent.putExtra("imageUrl", redditData?.get(position)?.data?.imageUrl)
+                    intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
                     intent.putExtra("articleUrl",
-                        redditData?.get(position)?.data?.id
+                        redditData?.get(position - 1)?.data?.id
                     )
                     context.startActivity(intent)
                 }

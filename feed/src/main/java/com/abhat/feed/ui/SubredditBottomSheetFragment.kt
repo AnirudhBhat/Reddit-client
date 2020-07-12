@@ -18,6 +18,7 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
     var feedFragment: FeedFragment? = null
     var sortType: SortType? = null
     private val subredditList = listOf<String>(
+        "frontpage",
         "all",
         "Popular",
         "Art",

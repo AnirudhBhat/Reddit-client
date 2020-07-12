@@ -66,12 +66,10 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_feed, container, false)
-//        if (isFromSubreddit == null || isFromSubreddit == false) {
             setupRecyclerView(view)
             observeViewModel()
             feedViewModel.showProgressBar()
             feedViewModel.getFeed(SUBREDDIT, after, SortType.empty)
-//        }
         return view
     }
 

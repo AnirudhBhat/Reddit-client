@@ -55,8 +55,8 @@ class CommentsAdapter(private val cardData: CardData,
                 author.text = cardData.author
                 subreddit.text = cardData.subreddit
                 created.text = cardData.timeHoursAgo
-                points.text = cardData.points + " Points"
-                comments.text = cardData.comments + " Comments"
+                points.text = cardData.points
+                comments.text = cardData.comments
                 imageUrl?.let { imageUrl ->
                     iv_image.load(imageUrl)
                 } ?: run {

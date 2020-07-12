@@ -13,7 +13,7 @@ open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository {
 
     override suspend fun getFeed(subreddit: String, after: String, sortType: SortType): FeedViewResult? {
         try {
-            val response: RedditResponse = if ( subreddit.isNullOrEmpty()) {
+            val response: RedditResponse = if ( subreddit.isNullOrEmpty() || subreddit.equals("frontpage", ignoreCase = true)) {
                 when (sortType) {
                     SortType.empty -> {
                         redditApi.getRedditFrontPage(sortType = "", after = after).await()

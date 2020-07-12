@@ -49,6 +49,14 @@ class FeedViewModelTest {
     }
 
     @Test
+    fun `show "Best" option in sort type bottom fragment when applied on frontpage (subreddit string is 'frontpage')`() {
+        feedRepository = FakeFeedRepository()
+        feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+
+        Assert.assertTrue(feedViewModel.shouldShowBestOptionInSortList("frontpage"))
+    }
+
+    @Test
     fun `show "Best" option in sort type bottom fragment when applied on frontpage (when nothing is passed as parameter)`() {
         feedRepository = FakeFeedRepository()
         feedViewModel = FeedViewModel(feedRepository, TestContextProvider())

@@ -93,7 +93,7 @@ open class FeedViewModel(
     }
 
     fun shouldShowBestOptionInSortList(subreddit: String? = null): Boolean {
-        return subreddit == null || subreddit.isEmpty()
+        return subreddit == null || subreddit.isEmpty() || subreddit.equals("frontpage", ignoreCase = true)
     }
 
     private fun returnSortTypeListWithoutBestOption(): List<SortType> {

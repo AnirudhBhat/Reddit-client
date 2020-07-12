@@ -25,6 +25,17 @@ class FeedRepositoryTest {
     }
 
     @Test
+    fun `when sort type is empty and subreddit is 'frontpage', call reddit's frontpage`() {
+        runBlocking {
+            val fakeRedditApi: RedditApi = mock()
+            val feedRepository = FeedRepositoryImpl(fakeRedditApi)
+
+            feedRepository.getFeed("frontpage", "", SortType.empty)
+            verify(fakeRedditApi).getRedditFrontPage("", "")
+        }
+    }
+
+    @Test
     fun `when sort type is best and subreddit is either empty or null, call reddit's frontpage with proper sorttype`() {
         runBlocking {
             val fakeRedditApi: RedditApi = mock()

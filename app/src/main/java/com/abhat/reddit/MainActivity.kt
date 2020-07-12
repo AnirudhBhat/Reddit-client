@@ -2,6 +2,7 @@ package com.abhat.reddit
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.abhat.feed.ui.FeedFragment
@@ -29,6 +30,13 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.subreddit -> {
                     //replaceFragment()
+                    replaceFragment(FeedFragment.newInstance(true))
+                    Handler().postDelayed({
+                        bottom_navigation.menu.getItem(0).isCheckable = true
+                        bottom_navigation.menu.getItem(0).isChecked = true
+                    }, 1000)
+                    bottom_navigation.menu.getItem(1).isCheckable = false
+                    bottom_navigation.menu.getItem(1).isChecked = false
                     true
                 }
 

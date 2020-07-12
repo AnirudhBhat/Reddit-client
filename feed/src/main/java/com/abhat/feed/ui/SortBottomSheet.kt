@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.fragment_sort_bottomsheet_layout.*
  */
 class SortBottomSheet: BottomSheetDialogFragment() {
 
-    var feedViewModel: FeedViewModel? = null
     var feedFragment: FeedFragment? = null
     var subreddit: String = ""
 

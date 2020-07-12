@@ -11,6 +11,7 @@ data class FeedViewState(
     val isLoading: Boolean = false,
     val feedList: RedditResponse? = null,
     val sortType: SortType = SortType.hot,
+    val subreddit: String,
     val sortList: List<SortType> = listOf(SortType.hot, SortType.new, SortType.rising),
     val error: Throwable? = null,
     val authorizationError: Throwable? = null

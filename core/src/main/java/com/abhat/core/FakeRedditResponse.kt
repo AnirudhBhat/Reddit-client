@@ -1,5 +1,6 @@
 package com.abhat.core
 
+import com.abhat.core.SortType.SortType
 import com.abhat.core.model.*
 
 /**
@@ -25,7 +26,8 @@ object FakeRedditResponse {
         )
     }
 
-    fun returnRedditResponse(url: String = "", isVideo: Boolean = false): RedditResponse {
+    fun returnRedditResponse(url: String = "", isVideo: Boolean = false,
+    subreddit: String = "", sortType: SortType = SortType.hot): RedditResponse {
         return  RedditResponse(
             kind = "",
             data = Data(

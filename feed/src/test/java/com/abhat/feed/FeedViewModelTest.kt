@@ -1,9 +1,14 @@
 package com.abhat.feed
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
+import com.abhat.core.FakeRedditResponse
+import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.data.FeedRepository
 import com.abhat.feed.ui.FeedViewModel
+import com.abhat.feed.ui.state.FeedViewState
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert
@@ -19,10 +24,16 @@ class FeedViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
     private lateinit var feedViewModel: FeedViewModel
     private lateinit var feedRepository: FeedRepository
+    private lateinit var feedObserver: Observer<FeedViewState>
 
     class TestContextProvider : CoroutineContextProvider() {
         override val Main: CoroutineDispatcher = Dispatchers.Unconfined
         override val IO: CoroutineDispatcher = Dispatchers.Unconfined
+    }
+
+    @Before
+    fun setup() {
+        feedObserver = mock()
     }
 
     @Test
@@ -47,5 +58,95 @@ class FeedViewModelTest {
         feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
 
         Assert.assertFalse(feedViewModel.shouldShowBestOptionInSortList("all"))
+    }
+
+    @Test
+    fun `selecting sort type as hot should return same sort type in feed UI state after successful response`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val feedUIState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.hot,
+            subreddit = "",
+            sortList = listOf(SortType.best, SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "", sortType = SortType.hot, after = "")
+        Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
+    }
+
+    @Test
+    fun `selecting sort type as rising should return same sort type in feed UI state after successful response`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val feedUIState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.rising,
+            subreddit = "",
+            sortList = listOf(SortType.best, SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "", sortType = SortType.rising, after = "")
+        Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
+    }
+
+    @Test
+    fun `selecting subreddit as anything other than frontpage should hide 'best' in feed UI state after successful response`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val feedUIState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.rising,
+            subreddit = "androiddev",
+            sortList = listOf(SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "androiddev", sortType = SortType.rising, after = "")
+        Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
+    }
+
+    @Test
+    fun `selecting subreddit as frontpage should show 'best' in feed UI state after successful response`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val feedUIState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.rising,
+            subreddit = "",
+            sortList = listOf(SortType.best, SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "", sortType = SortType.rising, after = "")
+        Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
+    }
+
+    @Test
+    fun `selecting subreddit as androiddev should return same subreddit type in feed UI state after successful response`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val feedUIState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.rising,
+            subreddit = "androiddev",
+            sortList = listOf(SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "androiddev", sortType = SortType.rising, after = "")
+        Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
     }
 }

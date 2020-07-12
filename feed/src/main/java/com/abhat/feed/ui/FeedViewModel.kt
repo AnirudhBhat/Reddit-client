@@ -23,7 +23,7 @@ open class FeedViewModel(
     private lateinit var sortTypeList: List<SortType>
     val feedViewState: MutableLiveData<FeedViewState> = MutableLiveData()
 
-    private var currentViewState = FeedViewState()
+    private var currentViewState = FeedViewState(subreddit = "all")
         set(value) {
             field = value
             feedViewState.postValue(value)
@@ -56,6 +56,7 @@ open class FeedViewModel(
                         currentViewState = currentViewState.copy(
                             isLoading = false,
                             feedList = feedViewResult.feedData,
+                            subreddit = subreddit,
                             sortType = sortType,
                             sortList = sortTypeList,
                             error = null
@@ -67,6 +68,7 @@ open class FeedViewModel(
                             currentViewState.copy(
                                 isLoading = false,
                                 feedList = null,
+                                subreddit = subreddit,
                                 sortType = sortType,
                                 sortList = sortTypeList,
                                 error = feedViewResult.throwable
@@ -78,6 +80,7 @@ open class FeedViewModel(
                             currentViewState.copy(
                                 isLoading = false,
                                 feedList = null,
+                                subreddit = subreddit,
                                 sortType = sortType,
                                 sortList = sortTypeList,
                                 authorizationError = feedViewResult.throwable

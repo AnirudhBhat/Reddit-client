@@ -25,6 +25,7 @@ class FeedFragment : Fragment() {
     private var feedAdapter: FeedAdapter? = null
     private var after: String = ""
     private val SUBREDDIT = "all"
+    private var isFromSubreddit: Boolean? = null
 
     private var loading = false
     var pastVisiblesItems: Int = 0
@@ -35,8 +36,27 @@ class FeedFragment : Fragment() {
 
 
     companion object {
-        fun newInstance(): FeedFragment {
-            return FeedFragment()
+        fun newInstance(fromSubreddit: Boolean = false): FeedFragment {
+            val bundle = Bundle()
+            bundle.putBoolean("is_from_subreddit", fromSubreddit)
+            val feedFragment = FeedFragment()
+            feedFragment.arguments = bundle
+            return feedFragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bundle = arguments
+        bundle?.let { bundle ->
+            if (bundle.containsKey("is_from_subreddit")) {
+                isFromSubreddit = bundle.getBoolean("is_from_subreddit")
+            }
+        }
+        isFromSubreddit?.let {
+            if (it) {
+                openSubredditBottomSheet()
+            }
         }
     }
 
@@ -46,10 +66,12 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_feed, container, false)
-        setupRecyclerView(view)
-        observeViewModel()
-        feedViewModel.showProgressBar()
-        feedViewModel.getFeed(SUBREDDIT, after)
+//        if (isFromSubreddit == null || isFromSubreddit == false) {
+            setupRecyclerView(view)
+            observeViewModel()
+            feedViewModel.showProgressBar()
+            feedViewModel.getFeed(SUBREDDIT, after)
+//        }
         return view
     }
 
@@ -128,7 +150,7 @@ class FeedFragment : Fragment() {
                         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                             feedViewModel.showProgressBar()
                             loading = true
-                            feedViewModel.getFeed(SUBREDDIT, after, currentFeedUiState.sortType)
+                            feedViewModel.getFeed(currentFeedUiState.subreddit, after, currentFeedUiState.sortType)
                         }
                     }
                 }
@@ -142,11 +164,20 @@ class FeedFragment : Fragment() {
 
     fun openSortBottomSheet() {
         val sortBottomSheet = SortBottomSheet()
-        sortBottomSheet.subreddit = SUBREDDIT
+        sortBottomSheet.subreddit = currentFeedUiState.subreddit
         sortBottomSheet.feedFragment = this
         sortBottomSheet.sortTypeList = currentFeedUiState.sortList
         activity?.supportFragmentManager?.let {
             sortBottomSheet.show(it, "sort_bottom_sheet")
+        }
+    }
+
+    fun openSubredditBottomSheet() {
+        val subredditBottomSheetFragment = SubredditBottomSheetFragment()
+        subredditBottomSheetFragment.feedFragment = this
+        subredditBottomSheetFragment.sortType = SortType.hot
+        activity?.supportFragmentManager?.let {
+            subredditBottomSheetFragment.show(it, "subreddit_bottom_sheet")
         }
     }
 }

@@ -40,6 +40,7 @@ open class FeedViewModel(
     }
 
     fun getFeed(subreddit: String, after: String, sortType: SortType = SortType.hot) {
+        showProgressBar()
         viewModelScope.launch(contextProvider.Main) {
             val feedViewResult =
                 withContext(viewModelScope.coroutineContext + contextProvider.IO) {

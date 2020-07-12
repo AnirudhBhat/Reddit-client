@@ -7,14 +7,18 @@ import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.data.FeedRepository
 import com.abhat.feed.ui.FeedViewModel
+import com.abhat.feed.ui.state.FeedViewResult
 import com.abhat.feed.ui.state.FeedViewState
+import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.RuntimeException
 
 /**
  * Created by Anirudh Uppunda on 07,July,2020
@@ -148,5 +152,54 @@ class FeedViewModelTest {
         feedViewModel.feedViewState.observeForever(feedObserver)
         feedViewModel.getFeed(subreddit = "androiddev", sortType = SortType.rising, after = "")
         Assert.assertEquals(feedUIState, feedViewModel.feedViewState.value)
+    }
+
+    @Test
+    fun `getFeed should show loading, and after returning successfully should hide loading`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val loadingState = FeedViewState(
+            isLoading = true,
+            subreddit = "all"
+        )
+
+        val successState = FeedViewState(
+            isLoading = false,
+            feedList =  FakeRedditResponse.returnRedditResponse(),
+            sortType = SortType.rising,
+            subreddit = "androiddev",
+            sortList = listOf(SortType.hot, SortType.new, SortType.rising),
+            error = null,
+            authorizationError = null
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "androiddev", sortType = SortType.rising, after = "")
+
+        val inOrder = inOrder(feedObserver)
+        inOrder.verify(feedObserver).onChanged(loadingState)
+        inOrder.verify(feedObserver).onChanged(successState)
+    }
+
+    @Test
+    fun `getFeed should show loading, and after after failing, return error and  should hide loading`() {
+        val feedViewResult = FeedViewResult.Error.NetworkError(Throwable(RuntimeException("Error!")))
+        val feedRepository = FakeFeedRepositoryWhichThrowsError(feedViewResult)
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val loadingState = FeedViewState(
+            isLoading = true,
+            subreddit = "all"
+        )
+
+        val errorState = FeedViewState(
+            isLoading = false,
+            subreddit = "all",
+            error = feedViewResult.throwable
+        )
+        feedViewModel.feedViewState.observeForever(feedObserver)
+        feedViewModel.getFeed(subreddit = "all", after = "")
+
+        val inOrder = inOrder(feedObserver)
+        inOrder.verify(feedObserver).onChanged(loadingState)
+        inOrder.verify(feedObserver).onChanged(errorState)
     }
 }

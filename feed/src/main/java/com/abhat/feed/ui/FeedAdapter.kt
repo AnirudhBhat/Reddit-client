@@ -37,19 +37,20 @@ open class FeedAdapter(
 
     private var view: FeedViewHolder? = null
     private var trendingAndSortViewHolder: TrendingAndSortViewHolder? = null
-    private var feedAdapterController: FeedAdapterController? = null
-    private var gifUrl: String? = null
     private val ioScope = CoroutineScope(contextProvider.IO + SupervisorJob())
     private val mainScope = CoroutineScope(contextProvider.Main + SupervisorJob())
 
+    private var sortType: SortType = SortType.hot
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)
-        if (viewType == 0) {
+        return if (viewType == 0) {
             trendingAndSortViewHolder =  TrendingAndSortViewHolder(layoutInflater.inflate(R.layout.item_trending_and_sort, parent, false), fragment)
-            return trendingAndSortViewHolder as TrendingAndSortViewHolder
+            trendingAndSortViewHolder?.sortType = sortType
+            trendingAndSortViewHolder as TrendingAndSortViewHolder
         } else {
             view = FeedViewHolder(layoutInflater.inflate(R.layout.activity_reddit_card, parent, false))
-            return view as FeedViewHolder
+            view as FeedViewHolder
         }
     }
 
@@ -63,12 +64,16 @@ open class FeedAdapter(
 
     fun updateRedditData(redditData: MutableList<Children>?, sortType: SortType) {
         this.redditData = redditData
-        trendingAndSortViewHolder?.sortType = sortType
+        // This variable is needed for the very first time the app opens and
+        // TrendingAndSortViewHolder is not created yet we don't know the sort type yet.
+        this.sortType = sortType
         notifyDataSetChanged()
+        trendingAndSortViewHolder?.sortType = sortType
     }
 
     fun addRedditData(redditData: List<Children>?, sortType: SortType) {
         trendingAndSortViewHolder?.sortType = sortType
+        this.sortType = sortType
         redditData?.let { redditData ->
             this.redditData?.addAll(redditData)
             notifyItemChanged(redditData.size)

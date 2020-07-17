@@ -58,7 +58,7 @@ open class FeedViewModel(
                             isLoading = false,
                             feedList = feedViewResult.feedData,
                             subreddit = subreddit,
-                            sortType = sortType,
+                            sortType = returnSortType(sortType, subreddit),
                             sortList = sortTypeList,
                             error = null
                         )
@@ -70,7 +70,7 @@ open class FeedViewModel(
                                 isLoading = false,
                                 feedList = null,
                                 subreddit = subreddit,
-                                sortType = sortType,
+                                sortType = returnSortType(sortType, subreddit),
                                 sortList = sortTypeList,
                                 error = feedViewResult.throwable
                             )
@@ -82,7 +82,7 @@ open class FeedViewModel(
                                 isLoading = false,
                                 feedList = null,
                                 subreddit = subreddit,
-                                sortType = sortType,
+                                sortType = returnSortType(sortType, subreddit),
                                 sortList = sortTypeList,
                                 authorizationError = feedViewResult.throwable
                             )
@@ -91,6 +91,8 @@ open class FeedViewModel(
             }
         }
     }
+
+
 
     fun shouldShowBestOptionInSortList(subreddit: String? = null): Boolean {
         return subreddit == null || subreddit.isEmpty() || subreddit.equals("frontpage", ignoreCase = true)
@@ -111,5 +113,12 @@ open class FeedViewModel(
             SortType.new,
             SortType.rising
         )
+    }
+
+    fun returnSortType(sortType: SortType, subreddit: String): SortType {
+        if (sortType == SortType.empty && shouldShowBestOptionInSortList(subreddit)) {
+            return SortType.best
+        }
+        return sortType
     }
 }

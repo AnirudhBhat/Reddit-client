@@ -210,4 +210,36 @@ class FeedViewModelTest {
         inOrder.verify(feedObserver).onChanged(loadingState)
         inOrder.verify(feedObserver).onChanged(errorState)
     }
+
+    @Test
+    fun `Return sort type as 'best' when sort type is empty and subreddit is frontpage`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+
+        Assert.assertEquals(SortType.best, feedViewModel.returnSortType(SortType.empty, "frontpage"))
+    }
+
+    @Test
+    fun `Return sort type as 'best' when sort type is empty and subreddit is empty`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+
+        Assert.assertEquals(SortType.best, feedViewModel.returnSortType(SortType.empty, ""))
+    }
+
+    @Test
+    fun `Return sort type as 'hot' when given sort type is hot and subreddit is anything other than frontpage`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+
+        Assert.assertEquals(SortType.hot, feedViewModel.returnSortType(SortType.hot, "all"))
+    }
+
+    @Test
+    fun `Return sort type as 'rising' when given sort type is rising and subreddit is anything other than frontpage`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+
+        Assert.assertEquals(SortType.rising, feedViewModel.returnSortType(SortType.rising, "all"))
+    }
 }

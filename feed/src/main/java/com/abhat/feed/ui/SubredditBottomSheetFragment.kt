@@ -17,7 +17,7 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
 
     var feedFragment: FeedFragment? = null
     var sortType: SortType? = null
-    private val subredditList = listOf<String>(
+    private val subredditList = listOf(
         "frontpage",
         "all",
         "Popular",
@@ -28,6 +28,7 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
         "androiddev",
         "android_devs",
         "books",
+        "cozyplaces",
         "creepy",
         "dataisbeautiful",
         "DIY",
@@ -38,11 +39,15 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
         "funny",
         "GetMotivated",
         "IAMA",
+        "instant_regret",
+        "IdiotsInCars",
         "LifeProTips",
         "movies",
         "news",
+        "nextfuckinglevel",
         "OldSchoolCool",
         "pics",
+        "PublicFreakout",
         "science",
         "todayilearned",
         "space",

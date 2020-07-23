@@ -1,21 +1,20 @@
 package com.abhat.comment.ui
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import coil.api.load
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.abhat.comment.R
 import com.abhat.core.model.Children
-import com.abhat.core.model.ChildrenData
 import com.abhat.core.model.RedditResponse
 import kotlinx.android.synthetic.main.activity_comments.*
-import kotlinx.android.synthetic.main.item_card.*
 import org.koin.android.ext.android.inject
+
 
 /**
  * Created by Anirudh Uppunda on 03,June,2020
@@ -25,6 +24,8 @@ class CommentsActivity: AppCompatActivity() {
     private var commentsAdapter: CommentsAdapter? = null
     private val list = mutableListOf<Children>()
     private var indent = 0
+    private var previousParentCommentPosition = 1
+    private var childrenIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +38,16 @@ class CommentsActivity: AppCompatActivity() {
         val comments = intent.getStringExtra("comments")
         val articleUrl = intent.getStringExtra("articleUrl")
         val imageUrl = intent.getStringExtra("imageUrl")
+        val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
+        fab_next_parent_comment.setOnClickListener {
+            previousParentCommentPosition = commentsViewModel.getNextParentCommentPosition(previousParentCommentPosition + 1, list) ?: 0
+            smoothScroller.targetPosition = previousParentCommentPosition
+            (rv_comments.layoutManager as LinearLayoutManager).startSmoothScroll(smoothScroller)
+        }
         setupRecyclerView(
             CardData(
                 title,
@@ -45,8 +56,7 @@ class CommentsActivity: AppCompatActivity() {
                 timeHoursAgo,
                 points,
                 comments
-        ), imageUrl
-        )
+        ), imageUrl)
         observeViewModel()
         commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
     }
@@ -76,20 +86,32 @@ class CommentsActivity: AppCompatActivity() {
     }
 
     private fun printRedditComments(children: MutableList<Children>) {
-        for (children in children) {
-            //if (!TextUtils.isEmpty(children.data.body)) {
-                list.add(children)
-                Log.d("TAG", "COMMENT: " + children.data.body)
-                if (children.data.replies != null) {
-                    indent = getIndent(children.data.depth, indent)
-                    children.indent = indent
-                    printRedditComments((children.data.replies as RedditResponse).data.children)
-                } else {
-                    indent = getIndent(children.data.depth, indent)
-                    children.indent = indent
+        children.forEachIndexed { index, children ->
+            list.add(children)
+            Log.d("TAG", "COMMENT: " + children.data.body)
+            if (children.data.replies != null) {
+                indent = getIndent(children.data.depth, indent)
+                if (indent == 5) {
+                    children.isParentComment = true
+                    children.childrenIndex = childrenIndex++
                 }
-            //}
+                children.indent = indent
+                printRedditComments((children.data.replies as RedditResponse).data.children)
+            } else {
+                indent = getIndent(children.data.depth, indent)
+                if (indent == 5) {
+                    children.isParentComment = true
+                    children.childrenIndex = childrenIndex++
+                }
+                children.indent = indent
+            }
         }
+
+//        for (children in children) {
+//            //if (!TextUtils.isEmpty(children.data.body)) {
+//
+//            //}
+//        }
     }
 
     private fun getIndent(depth: Int, indent: Int): Int {

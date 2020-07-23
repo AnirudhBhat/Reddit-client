@@ -10,5 +10,7 @@ data class Children(
     val data: ChildrenData,
     @field:Json(name = "kind")
     val kind: String,
-    var indent: Int
+    var indent: Int,
+    var isParentComment: Boolean = false,
+    var childrenIndex: Int = 0
 )

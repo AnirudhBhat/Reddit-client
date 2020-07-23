@@ -27,7 +27,8 @@ object FakeRedditResponse {
     }
 
     fun returnRedditResponse(url: String = "", isVideo: Boolean = false,
-    subreddit: String = "", sortType: SortType = SortType.hot): RedditResponse {
+    subreddit: String = "", sortType: SortType = SortType.hot,
+                             replies: RedditResponse? = null): RedditResponse {
         return  RedditResponse(
             kind = "",
             data = Data(
@@ -36,10 +37,53 @@ object FakeRedditResponse {
                 mutableListOf<Children>(
                     Children(
                         prepareAndReturnData(
-                            url = url
+                            url = url,
+                            replies = replies
                         ),
                         "",
-                        1
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 0
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = false,
+                        childrenIndex = 1
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 2
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = false,
+                        childrenIndex = 3
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 4
                     )
                 ),
                 "",
@@ -48,25 +92,102 @@ object FakeRedditResponse {
         )
     }
 
-    fun returnRedditPostDetailResponse(url: String = "", isVideo: Boolean = false): List<RedditResponse> {
-        return  listOf<RedditResponse>(RedditResponse(
-            kind = "",
-            data = Data(
-                null,
-                null,
-                mutableListOf<Children>(
-                    Children(
-                        prepareAndReturnData(
-                            url = url
-                        ),
-                        "",
-                        1
-                    )
+    fun returnChildrens(): List<Children> {
+        return mutableListOf<Children>(
+            Children(
+                prepareAndReturnData(),
+                "",
+                1,
+                isParentComment = true,
+                childrenIndex = 0
+            ),
+            Children(
+                prepareAndReturnData(
                 ),
                 "",
-                ""
+                1,
+                isParentComment = false,
+                childrenIndex = 1
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = true,
+                childrenIndex = 2
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 3
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = true,
+                childrenIndex = 4
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 5
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 6
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 7
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 8
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = false,
+                childrenIndex = 9
+            ),
+            Children(
+                prepareAndReturnData(
+                ),
+                "",
+                1,
+                isParentComment = true,
+                childrenIndex = 10
             )
-        ),
+        )
+    }
+
+    fun returnRedditPostDetailResponse(url: String = "",
+                                       isVideo: Boolean = false,
+                                        replies: RedditResponse? = null): List<RedditResponse> {
+        return  listOf<RedditResponse>(
             RedditResponse(
                 kind = "",
                 data = Data(
@@ -84,12 +205,74 @@ object FakeRedditResponse {
                     "",
                     ""
                 )
-            ))
+            ),
+            RedditResponse(
+            kind = "",
+            data = Data(
+                null,
+                null,
+                mutableListOf<Children>(
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = replies
+                        ),
+                        "",
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 0
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = false,
+                        childrenIndex = 1
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 2
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = false,
+                        childrenIndex = 3
+                    ),
+                    Children(
+                        prepareAndReturnData(
+                            url = url,
+                            replies = null
+                        ),
+                        "",
+                        1,
+                        isParentComment = true,
+                        childrenIndex = 4
+                    )
+                ),
+                "",
+                ""
+            )
+        ))
     }
 
     private fun prepareAndReturnData(url: String = "",
                                      isVideo: Boolean = false, domain: String = "",
-                                     previewSize: Int = 5): ChildrenData {
+                                     previewSize: Int = 5,
+                                     replies: RedditResponse? = null): ChildrenData {
 
         return ChildrenData(false,
             "",
@@ -118,7 +301,7 @@ object FakeRedditResponse {
             "",
             0,
             "",
-            null,
+            replies,
             0,
             "",
             "",
@@ -129,6 +312,26 @@ object FakeRedditResponse {
             domain = domain,
             isVideo = isVideo,
             secureMedia = null)
+    }
+
+    fun returnRepliesResponse(): RedditResponse {
+        return RedditResponse(
+            kind = "",
+            data = Data(
+                null,
+                null,
+                mutableListOf<Children>(
+                    Children(
+                        prepareAndReturnData(),
+                        "",
+                        1,
+                        isParentComment = false
+                    )
+                ),
+                "",
+                ""
+            )
+        )
     }
 
     private fun returnPreview(size: Int): Preview? {

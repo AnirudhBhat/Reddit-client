@@ -48,7 +48,7 @@ class CommentsViewModelTest {
         runBlocking {
             commentsViewModel.getUIState().observeForever(postDetailsObserver)
             val loadingTrueState = UIState(isLoading = true, success = null, error = null)
-            val successState = UIState(isLoading = false, success = FakeRedditResponse.returnRedditResponse(), error = null)
+            val successState = UIState(isLoading = false, success = FakeRedditResponse.returnRedditPostDetailResponse()[1], error = null)
 
             commentsViewModel.onAction(Action.LoadPostDetails("subreddit", "article"))
 
@@ -74,6 +74,33 @@ class CommentsViewModelTest {
             Assert.assertEquals(failureState.error?.message, commentsViewModel.getUIState()?.value?.error?.message)
             Assert.assertEquals(failureState.isLoading, commentsViewModel.getUIState()?.value?.isLoading)
             Assert.assertEquals(failureState.success, commentsViewModel.getUIState()?.value?.success)
+        }
+    }
+
+    @Test
+    fun `when current position is 0, get the next parent comment's position correctly`() {
+        runBlocking {
+            val fakeCommentsRepository = FakeCommentsRepository()
+            val commentsViewModel = CommentsViewModel(fakeCommentsRepository, TestContextProvider())
+            Assert.assertEquals(2, commentsViewModel.getNextParentCommentPosition(0, FakeRedditResponse.returnChildrens()))
+        }
+    }
+
+    @Test
+    fun `when current position is 2, get the next parent comment's position correctly`() {
+        runBlocking {
+            val fakeCommentsRepository = FakeCommentsRepository()
+            val commentsViewModel = CommentsViewModel(fakeCommentsRepository, TestContextProvider())
+            Assert.assertEquals(4, commentsViewModel.getNextParentCommentPosition(2, FakeRedditResponse.returnChildrens()))
+        }
+    }
+
+    @Test
+    fun `when current position is 4, get the next parent comment's position correctly`() {
+        runBlocking {
+            val fakeCommentsRepository = FakeCommentsRepository()
+            val commentsViewModel = CommentsViewModel(fakeCommentsRepository, TestContextProvider())
+            Assert.assertEquals(10, commentsViewModel.getNextParentCommentPosition(4, FakeRedditResponse.returnChildrens()))
         }
     }
 }

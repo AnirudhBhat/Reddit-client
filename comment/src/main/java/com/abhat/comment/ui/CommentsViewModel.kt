@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhat.comment.data.CommentsRepository
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.model.Children
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
@@ -68,5 +69,14 @@ class CommentsViewModel(private val commentRepository: CommentsRepository,
                 currentUIState.copy(isLoading = false, success = null, error = postDetailState.throwable)
             }
         }
+    }
+
+    fun getNextParentCommentPosition(previousParentCommentPosition: Int, list: List<Children>): Int? {
+        list.forEachIndexed {index,  children ->
+            if (index > previousParentCommentPosition && children.isParentComment) {
+                return index
+            }
+        }
+        return null
     }
 }

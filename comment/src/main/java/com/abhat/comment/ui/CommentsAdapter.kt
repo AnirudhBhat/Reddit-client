@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.item_card.view.*
 /**
  * Created by Anirudh Uppunda on 03,June,2020
  */
-class CommentsAdapter(private val cardData: CardData,
+class CommentsAdapter(val cardData: CardData,
                       private var commentsList: List<Children>,
                       private val imageUrl: String?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

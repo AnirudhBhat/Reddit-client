@@ -13,6 +13,7 @@ import com.abhat.comment.R
 import com.abhat.core.model.Children
 import com.abhat.core.model.RedditResponse
 import kotlinx.android.synthetic.main.activity_comments.*
+import kotlinx.android.synthetic.main.item_comments_single_row.view.*
 import org.koin.android.ext.android.inject
 
 
@@ -65,6 +66,15 @@ class CommentsActivity: AppCompatActivity() {
         rv_comments.layoutManager = LinearLayoutManager(this)
         commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl)
         rv_comments.adapter = commentsAdapter
+        rv_comments.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val firstVisibleItemPosition = (rv_comments.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                if ((recyclerView.findViewHolderForLayoutPosition(firstVisibleItemPosition) as? CommentsViewHolder)?.itemView?.parent_comment?.text == "true") {
+                    previousParentCommentPosition =  (recyclerView.findViewHolderForLayoutPosition(firstVisibleItemPosition) as? CommentsViewHolder)?.itemView?.comment_index?.text.toString().toInt()
+                }
+            }
+        })
     }
 
     private fun observeViewModel() {
@@ -76,6 +86,7 @@ class CommentsActivity: AppCompatActivity() {
             }
             uiState.success?.data?.children?.let { children ->
                 pb_comments_activity.visibility = View.GONE
+                fab_next_parent_comment.visibility = View.VISIBLE
                 printRedditComments(children)
                 commentsAdapter?.updateCommentsList(list)
                 commentsAdapter?.notifyItemChanged(1)
@@ -87,13 +98,14 @@ class CommentsActivity: AppCompatActivity() {
 
     private fun printRedditComments(children: MutableList<Children>) {
         children.forEachIndexed { index, children ->
+            childrenIndex++
             list.add(children)
             Log.d("TAG", "COMMENT: " + children.data.body)
             if (children.data.replies != null) {
                 indent = getIndent(children.data.depth, indent)
                 if (indent == 5) {
                     children.isParentComment = true
-                    children.childrenIndex = childrenIndex++
+                    children.childrenIndex = childrenIndex
                 }
                 children.indent = indent
                 printRedditComments((children.data.replies as RedditResponse).data.children)
@@ -101,7 +113,7 @@ class CommentsActivity: AppCompatActivity() {
                 indent = getIndent(children.data.depth, indent)
                 if (indent == 5) {
                     children.isParentComment = true
-                    children.childrenIndex = childrenIndex++
+                    children.childrenIndex = childrenIndex
                 }
                 children.indent = indent
             }

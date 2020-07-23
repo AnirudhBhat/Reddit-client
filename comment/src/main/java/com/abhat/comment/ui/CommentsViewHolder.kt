@@ -1,6 +1,8 @@
 package com.abhat.comment.ui
 
+import android.text.Html
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +16,11 @@ import kotlinx.android.synthetic.main.item_comments_single_row.view.*
 class CommentsViewHolder(private val view: View): RecyclerView.ViewHolder(view) {
     fun bind(commentsList: List<Children>, pos: Int) {
         with (view) {
+            parent_comment.text = if (commentsList[pos].isParentComment) "true" else "false"
+            comment_index.text = commentsList[pos].childrenIndex.toString()
             if (!TextUtils.isEmpty(commentsList[pos].data?.body)) {
-                tv_comment.text = commentsList[pos].data?.body
+                tv_comment.text = Html.fromHtml((Html.fromHtml(commentsList[pos].data?.bodyHtml).toString()))
+                tv_comment.movementMethod = LinkMovementMethod.getInstance()
                 setMargins(cv_comment, commentsList[pos].indent, 0, 0, 0)
                 tv_author.text = commentsList[pos].data?.author
                 tv_points.text = commentsList[pos].data?.score.toString() + " Points"

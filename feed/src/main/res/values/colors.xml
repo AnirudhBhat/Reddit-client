@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#202020</color>
     <color name="colorPrimaryDark">#1b1b1b</color>
-    <color name="colorAccent">#1DE9B6</color>
+    <color name="colorAccent">#1976D2</color>
     <color name="whitewithalpha">#e0e0e0</color>
     <color name="upvoteColor">#FF3D00</color>
     <color name="downvoteColor">#1565C0</color>

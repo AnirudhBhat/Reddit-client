@@ -116,4 +116,20 @@
         android:paddingEnd="24dp"
         tools:text="This is a sample comment"
         android:textColor="@color/title_color" />
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/parent_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/comment_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

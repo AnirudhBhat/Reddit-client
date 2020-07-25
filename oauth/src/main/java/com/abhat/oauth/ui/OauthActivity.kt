@@ -7,6 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.abhat.core.BuildConfig
 import com.abhat.oauth.PreferenceHelper
 import com.abhat.oauth.R
 import com.abhat.oauth.encodeBase64ToString
@@ -22,7 +23,7 @@ class OauthActivity : AppCompatActivity() {
 
     val state = UUID.randomUUID().toString()
     val url = "https://www.reddit.com/api/v1/authorize.compact?" +
-            "client_id=CLIENT_ID" +
+            "client_id=${BuildConfig.CLIENT_ID}" +
             "&duration=permanent" +
             "&response_type=code" +
             "&state=$state" +
@@ -91,7 +92,7 @@ class OauthActivity : AppCompatActivity() {
                         val authCode = uri.getQueryParameter("code")
                         val headersAndFields = populateHeadersAndFields(
                             authCode!!,
-                            "CLIENT_ID",
+                            BuildConfig.CLIENT_ID,
                             "https://github.com/anirudhbhat"
                         )
                         oauthViewModel.retrieveAccessToken(

@@ -55,6 +55,7 @@ versions.koinandroid = '1.0.2'
 versions.material = '1.0.0'
 versions.glide = '4.9.0'
 versions.exoplayer = '2.9.6'
+versions.recyclerview = '1.2.0-alpha02'
 
 def lib = [:]
 lib.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
@@ -85,6 +86,7 @@ lib.retrofitlogging = "com.squareup.okhttp3:logging-interceptor:$versions.retrof
 lib.glide = "com.github.bumptech.glide:glide:$versions.glide"
 lib.glidecompiler = "com.github.bumptech.glide:compiler:$versions.glide"
 lib.exoplayer = "com.google.android.exoplayer:exoplayer:$versions.exoplayer"
+lib.recyclerview = "androidx.recyclerview:recyclerview:$versions.recyclerview"
 ext.lib = lib
 
 def kotlin = [:]

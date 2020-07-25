@@ -38,6 +38,7 @@ dependencies {
     implementation lib.koinviewmodel
     implementation lib.retrofitlogging
     implementation lib.threetenabp
+    api lib.recyclerview
     api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation lib.junit
     androidTestImplementation lib.junitext

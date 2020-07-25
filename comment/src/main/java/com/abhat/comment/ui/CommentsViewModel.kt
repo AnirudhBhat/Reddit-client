@@ -15,9 +15,6 @@ class CommentsViewModel(private val commentRepository: CommentsRepository,
                         private val contextProvider: CoroutineContextProvider
 ) : ViewModel() {
 
-    private val viewState: MutableLiveData<PostDetailState> = MutableLiveData()
-    fun getViewState() = viewState as LiveData<PostDetailState>
-
     private val uiState: MutableLiveData<UIState> = MutableLiveData()
     fun getUIState() = uiState as LiveData<UIState>
 

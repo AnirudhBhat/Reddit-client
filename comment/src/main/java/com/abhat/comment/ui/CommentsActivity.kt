@@ -15,13 +15,14 @@ import com.abhat.core.model.RedditResponse
 import kotlinx.android.synthetic.main.activity_comments.*
 import kotlinx.android.synthetic.main.item_comments_single_row.view.*
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
 /**
  * Created by Anirudh Uppunda on 03,June,2020
  */
 class CommentsActivity: AppCompatActivity() {
-    private val commentsViewModel: CommentsViewModel by inject()
+    private val commentsViewModel: CommentsViewModel by viewModel()
     private var commentsAdapter: CommentsAdapter? = null
     private val list = mutableListOf<Children>()
     private var indent = 0
@@ -59,13 +60,18 @@ class CommentsActivity: AppCompatActivity() {
                 comments
         ), imageUrl)
         observeViewModel()
-        commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
+        commentsViewModel.getUIState().value?.let {
+            bindUI(it)
+        } ?: run {
+            commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
+        }
     }
 
     private fun setupRecyclerView(cardData: CardData, imageUrl: String?) {
         rv_comments.layoutManager = LinearLayoutManager(this)
         commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl)
         rv_comments.adapter = commentsAdapter
+        commentsAdapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         rv_comments.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -79,21 +85,25 @@ class CommentsActivity: AppCompatActivity() {
 
     private fun observeViewModel() {
         commentsViewModel.getUIState().observe(this, Observer { uiState ->
-            if (uiState.isLoading) {
-                pb_comments_activity.visibility = View.VISIBLE
-            } else {
-
-            }
-            uiState.success?.data?.children?.let { children ->
-                pb_comments_activity.visibility = View.GONE
-                fab_next_parent_comment.visibility = View.VISIBLE
-                printRedditComments(children)
-                commentsAdapter?.updateCommentsList(list)
-                commentsAdapter?.notifyItemChanged(1)
-//                rv_comments?.scheduleLayoutAnimation()
-            }
-            Log.d("TAG", "COMMENT: " + uiState?.success?.data?.children?.get(1)?.data?.body)
+            bindUI(uiState)
         })
+    }
+
+    private fun bindUI(uiState: UIState) {
+        if (uiState.isLoading) {
+            pb_comments_activity.visibility = View.VISIBLE
+        } else {
+
+        }
+        uiState.success?.data?.children?.let { children ->
+            pb_comments_activity.visibility = View.GONE
+            fab_next_parent_comment?.visibility = View.VISIBLE
+            printRedditComments(children)
+            commentsAdapter?.updateCommentsList(list)
+            commentsAdapter?.notifyItemChanged(1)
+//                rv_comments?.scheduleLayoutAnimation()
+        }
+        Log.d("TAG", "COMMENT: " + uiState?.success?.data?.children?.get(1)?.data?.body)
     }
 
     private fun printRedditComments(children: MutableList<Children>) {

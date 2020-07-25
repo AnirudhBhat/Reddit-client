@@ -1,6 +1,7 @@
 package com.abhat.feed.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.abhat.feed.R
 import com.abhat.feed.ui.state.FeedViewState
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * Created by Anirudh Uppunda on 22,April,2020
@@ -32,7 +34,7 @@ class FeedFragment : Fragment() {
     var visibleItemCount: Int = 0
     var totalItemCount: Int = 0
     private lateinit var currentFeedUiState: FeedViewState
-    private val feedViewModel: FeedViewModel by inject()
+    private val feedViewModel: FeedViewModel by viewModel()
 
 
     companion object {
@@ -68,8 +70,12 @@ class FeedFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_feed, container, false)
             setupRecyclerView(view)
             observeViewModel()
+        feedViewModel.feedViewState.value?.let {
+            bindUI(it)
+        } ?: run {
             feedViewModel.showProgressBar()
             feedViewModel.getFeed(SUBREDDIT, after, SortType.empty)
+        }
         return view
     }
 
@@ -83,27 +89,31 @@ class FeedFragment : Fragment() {
 
     private fun observeViewModel() {
         feedViewModel.feedViewState.observe(requireActivity(), Observer { feedViewState ->
-            currentFeedUiState = feedViewState
-            setProgressBarVisibility(feedViewState)
-            if (!feedViewState.isLoading) {
-                if (anyError(feedViewState)) {
-                    if (isNetworkError(feedViewState)) {
-                        showErrorToast("oops, something went wrong!, please check your connection")
-                    } else if (isAuthorizationError(feedViewState)) {
-                        showErrorToast("Please sign in to use this feature")
-                    }
-                } else {
-                    after = feedViewState?.feedList?.data?.after ?: ""
-                    if (loading) {
-                        feedAdapter?.addRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
-                    } else {
-                        feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
-                        feedRecyclerView?.scheduleLayoutAnimation()
-                    }
-                    loading = false
-                }
-            }
+            bindUI(feedViewState)
         })
+    }
+
+    private fun bindUI(feedViewState: FeedViewState) {
+        currentFeedUiState = feedViewState
+        setProgressBarVisibility(feedViewState)
+        if (!feedViewState.isLoading) {
+            if (anyError(feedViewState)) {
+                if (isNetworkError(feedViewState)) {
+                    showErrorToast("oops, something went wrong!, please check your connection")
+                } else if (isAuthorizationError(feedViewState)) {
+                    showErrorToast("Please sign in to use this feature")
+                }
+            } else {
+                after = feedViewState?.feedList?.data?.after ?: ""
+                if (loading) {
+                    feedAdapter?.addRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
+                } else {
+                    feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
+                    feedRecyclerView?.scheduleLayoutAnimation()
+                }
+                loading = false
+            }
+        }
     }
 
     private fun anyError(feedViewState: FeedViewState): Boolean {
@@ -123,9 +133,9 @@ class FeedFragment : Fragment() {
 
     private fun setProgressBarVisibility(viewState: FeedViewState) {
         if (viewState.isLoading) {
-            progress_bar.visibility = View.VISIBLE
+            progress_bar?.visibility = View.VISIBLE
         } else {
-            progress_bar.visibility = View.GONE
+            progress_bar?.visibility = View.GONE
         }
     }
 
@@ -135,6 +145,7 @@ class FeedFragment : Fragment() {
         feedRecyclerView?.layoutManager = layoutManager
         feedAdapter = FeedAdapter(activity, this, feedViewModel, null, CoroutineContextProvider())
         feedRecyclerView?.adapter = feedAdapter
+        feedAdapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

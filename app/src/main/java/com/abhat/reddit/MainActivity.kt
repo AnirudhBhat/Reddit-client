@@ -15,7 +15,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //startActivity(Intent(this, OauthActivity::class.java))
-        replaceFragment(FeedFragment.newInstance(), "feed_fragment")
+        if (savedInstanceState == null) {
+            replaceFragment(FeedFragment.newInstance(), "feed_fragment")
+        }
         bottom_navigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.profile -> {

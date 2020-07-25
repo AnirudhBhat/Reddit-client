@@ -5,6 +5,7 @@ import com.abhat.comment.data.CommentsRepositoryImpl
 import com.abhat.comment.ui.CommentsViewModel
 import com.abhat.core.RedditApi
 import com.abhat.core.common.CoroutineContextProvider
+import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
 /**
@@ -12,7 +13,7 @@ import org.koin.dsl.module.module
  */
 
 val postDetailModule = module {
-    factory { providePostDetailViewModel(get(), get()) }
+    viewModel { providePostDetailViewModel(get(), get()) }
     factory { providePostDetailRepository(get()) }
 }
 

@@ -33,7 +33,7 @@ class SortAdapter(private val sortList: List<SortType>,
         fun bind() {
             with (itemView) {
                 tv_sort_by.text = sortList[adapterPosition].name
-                tv_sort_by.setOnClickListener {
+                subreddit_layout.setOnClickListener {
                     feedFragment?.showProgressBar()
                     when (tv_sort_by.text) {
                         "hot" -> {

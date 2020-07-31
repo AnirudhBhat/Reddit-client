@@ -103,7 +103,6 @@ class CommentsActivity: AppCompatActivity() {
             commentsAdapter?.notifyItemChanged(1)
 //                rv_comments?.scheduleLayoutAnimation()
         }
-        Log.d("TAG", "COMMENT: " + uiState?.success?.data?.children?.get(1)?.data?.body)
     }
 
     private fun printRedditComments(children: MutableList<Children>) {

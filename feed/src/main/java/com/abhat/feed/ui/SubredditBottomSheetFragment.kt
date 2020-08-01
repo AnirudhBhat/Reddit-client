@@ -69,6 +69,11 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
         "likeus"
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppRoundedCornerBottomSheetDialogTheme)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

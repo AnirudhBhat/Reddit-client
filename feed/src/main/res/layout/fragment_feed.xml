@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:listitem="@layout/reddit_card_single_row"
-            android:layoutAnimation="@anim/layout_animation_fall_down"
+
             android:paddingBottom="?attr/actionBarSize">
 
         </androidx.recyclerview.widget.RecyclerView>

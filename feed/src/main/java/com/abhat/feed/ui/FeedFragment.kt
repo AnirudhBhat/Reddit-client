@@ -1,6 +1,7 @@
 package com.abhat.feed.ui
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.feed.R
+import com.abhat.feed.ui.constants.Constants
+import com.abhat.feed.ui.constants.Constants.KEY_SUBREDDIT_BOTTOM_SHEET
 import com.abhat.feed.ui.state.FeedViewState
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
@@ -40,7 +43,7 @@ class FeedFragment : Fragment() {
     companion object {
         fun newInstance(fromSubreddit: Boolean = false): FeedFragment {
             val bundle = Bundle()
-            bundle.putBoolean("is_from_subreddit", fromSubreddit)
+            bundle.putBoolean(Constants.IS_FROM_SUBREDDIT, fromSubreddit)
             val feedFragment = FeedFragment()
             feedFragment.arguments = bundle
             return feedFragment
@@ -51,8 +54,8 @@ class FeedFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val bundle = arguments
         bundle?.let { bundle ->
-            if (bundle.containsKey("is_from_subreddit")) {
-                isFromSubreddit = bundle.getBoolean("is_from_subreddit")
+            if (bundle.containsKey(Constants.IS_FROM_SUBREDDIT)) {
+                isFromSubreddit = bundle.getBoolean(Constants.IS_FROM_SUBREDDIT)
             }
         }
         isFromSubreddit?.let {
@@ -68,10 +71,16 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_feed, container, false)
-            setupRecyclerView(view)
-            observeViewModel()
+        setupRecyclerView(view)
+        observeViewModel()
         feedViewModel.feedViewState.value?.let {
             bindUI(it)
+            if (it.isSubredditBottomSheetOpen) {
+                openSubredditBottomSheet()
+            }
+            if (it.isSortBottomSheetOpen) {
+                openSortBottomSheet()
+            }
         } ?: run {
             feedViewModel.showProgressBar()
             feedViewModel.getFeed(SUBREDDIT, after, SortType.empty)
@@ -79,11 +88,19 @@ class FeedFragment : Fragment() {
         return view
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        feedViewModel.subredditBottomSheetClosed()
+//        feedViewModel.sortBottomSheetClosed()
+        super.onSaveInstanceState(outState)
+    }
+
     fun showProgressBar() {
         feedViewModel.showProgressBar()
     }
 
     fun getFeed(subreddit: String, after: String, sortType: SortType) {
+        feedViewModel.sortBottomSheetClosed()
+        feedViewModel.subredditBottomSheetClosed()
         feedViewModel.getFeed(subreddit, after, sortType)
     }
 
@@ -106,9 +123,15 @@ class FeedFragment : Fragment() {
             } else {
                 after = feedViewState?.feedList?.data?.after ?: ""
                 if (loading) {
-                    feedAdapter?.addRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
+                    feedAdapter?.addRedditData(
+                        feedViewState.feedList?.data?.children,
+                        feedViewState.sortType
+                    )
                 } else {
-                    feedAdapter?.updateRedditData(feedViewState.feedList?.data?.children, feedViewState.sortType)
+                    feedAdapter?.updateRedditData(
+                        feedViewState.feedList?.data?.children,
+                        feedViewState.sortType
+                    )
                     feedRecyclerView?.scheduleLayoutAnimation()
                 }
                 loading = false
@@ -145,7 +168,8 @@ class FeedFragment : Fragment() {
         feedRecyclerView?.layoutManager = layoutManager
         feedAdapter = FeedAdapter(activity, this, feedViewModel, null, CoroutineContextProvider())
         feedRecyclerView?.adapter = feedAdapter
-        feedAdapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        feedAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         feedRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -159,7 +183,11 @@ class FeedFragment : Fragment() {
                         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                             feedViewModel.showProgressBar()
                             loading = true
-                            feedViewModel.getFeed(currentFeedUiState.subreddit, after, currentFeedUiState.sortType)
+                            feedViewModel.getFeed(
+                                currentFeedUiState.subreddit,
+                                after,
+                                currentFeedUiState.sortType
+                            )
                         }
                     }
                 }
@@ -172,21 +200,51 @@ class FeedFragment : Fragment() {
     }
 
     fun openSortBottomSheet() {
-        val sortBottomSheet = SortBottomSheet()
-        sortBottomSheet.subreddit = currentFeedUiState.subreddit
-        sortBottomSheet.feedFragment = this
-        sortBottomSheet.sortTypeList = currentFeedUiState.sortList
-        activity?.supportFragmentManager?.let {
-            sortBottomSheet.show(it, "sort_bottom_sheet")
+        var sortBottomSheet =
+            activity?.supportFragmentManager?.findFragmentByTag(Constants.KEY_SORT_BOTTOM_SHEET) as? SortBottomSheet
+        sortBottomSheet?.let { sortBottomSheet ->
+            sortBottomSheet.subreddit = currentFeedUiState.subreddit
+            sortBottomSheet.feedFragment = this
+            sortBottomSheet.sortTypeList = currentFeedUiState.sortList
+            feedViewModel.sortBottomSheetOpened()
+        } ?: run {
+            sortBottomSheet = SortBottomSheet()
+            sortBottomSheet?.subreddit = currentFeedUiState.subreddit
+            sortBottomSheet?.feedFragment = this
+            sortBottomSheet?.sortTypeList = currentFeedUiState.sortList
+            activity?.supportFragmentManager?.let {
+                sortBottomSheet?.show(it, Constants.KEY_SORT_BOTTOM_SHEET)
+            }
+            feedViewModel.sortBottomSheetOpened()
         }
+        Handler().postDelayed({
+            sortBottomSheet?.dialog?.setOnCancelListener {
+                feedViewModel.sortBottomSheetClosed()
+            }
+        }, 200)
+
     }
 
     fun openSubredditBottomSheet() {
-        val subredditBottomSheetFragment = SubredditBottomSheetFragment()
-        subredditBottomSheetFragment.feedFragment = this
-        subredditBottomSheetFragment.sortType = SortType.hot
-        activity?.supportFragmentManager?.let {
-            subredditBottomSheetFragment.show(it, "subreddit_bottom_sheet")
+        var subredditFragment =
+            activity?.supportFragmentManager?.findFragmentByTag(KEY_SUBREDDIT_BOTTOM_SHEET) as? SubredditBottomSheetFragment
+        subredditFragment?.let { subredditFragment ->
+            subredditFragment?.feedFragment = this
+            subredditFragment?.sortType = SortType.hot
+            feedViewModel.subredditBottomSheetOpened()
+        } ?: run {
+            subredditFragment = SubredditBottomSheetFragment()
+            subredditFragment?.feedFragment = this
+            subredditFragment?.sortType = SortType.hot
+            activity?.supportFragmentManager?.let {
+                subredditFragment?.show(it, KEY_SUBREDDIT_BOTTOM_SHEET)
+            }
+            feedViewModel.subredditBottomSheetOpened()
         }
+        Handler().postDelayed({
+            subredditFragment?.dialog?.setOnCancelListener {
+                feedViewModel.subredditBottomSheetClosed()
+            }
+        }, 200)
     }
 }

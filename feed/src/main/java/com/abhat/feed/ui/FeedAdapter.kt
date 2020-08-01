@@ -62,6 +62,10 @@ open class FeedAdapter(
         return position
     }
 
+    fun getRedditData(): List<Children>? {
+        return redditData
+    }
+
     fun updateRedditData(redditData: MutableList<Children>?, sortType: SortType) {
         this.redditData = redditData
         // This variable is needed for the very first time the app opens and

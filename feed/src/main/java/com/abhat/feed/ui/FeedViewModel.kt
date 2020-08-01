@@ -39,6 +39,22 @@ open class FeedViewModel(
         currentViewState = currentViewState.copy(isLoading = false, feedList = null, error = null)
     }
 
+    fun subredditBottomSheetOpened() {
+        currentViewState = currentViewState.copy(isSubredditBottomSheetOpen = true)
+    }
+
+    fun subredditBottomSheetClosed() {
+        currentViewState = currentViewState.copy(isSubredditBottomSheetOpen = false)
+    }
+
+    fun sortBottomSheetOpened() {
+        currentViewState = currentViewState.copy(isSortBottomSheetOpen = true)
+    }
+
+    fun sortBottomSheetClosed() {
+        currentViewState = currentViewState.copy(isSortBottomSheetOpen = false)
+    }
+
     fun getFeed(subreddit: String, after: String, sortType: SortType) {
         showProgressBar()
         viewModelScope.launch(contextProvider.Main) {

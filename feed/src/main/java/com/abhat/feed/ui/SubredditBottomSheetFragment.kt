@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
 import com.abhat.feed.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -74,7 +75,7 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_subreddit_bottomsheet_layout, container, false)
-        return view;
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,5 +91,6 @@ class SubredditBottomSheetFragment: BottomSheetDialogFragment() {
             sortType,
             this
         )
+        (rv_subreddit.adapter as SubredditAdapter).stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 }

@@ -1,12 +1,13 @@
 package com.abhat.reddit
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.abhat.feed.ui.FeedFragment
-import com.abhat.oauth.ui.OauthActivity
+import com.abhat.feed.ui.SubredditBottomSheetFragment
+import com.abhat.feed.ui.constants.Constants
+import com.abhat.oauth.ui.OauthFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.profile -> {
-                    startActivity(Intent(this@MainActivity, OauthActivity::class.java))
+                    replaceFragment(OauthFragment())
                     true
                 }
 
@@ -32,17 +33,29 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.subreddit -> {
                     //replaceFragment()
-                    val feedFragment = supportFragmentManager.findFragmentByTag("feed_fragment")
-                    feedFragment?.let { feedFragment ->
-                        (feedFragment as FeedFragment).openSubredditBottomSheet()
+                    val subredditBottomSheetFragment = SubredditBottomSheetFragment()
+                    val feedFragment = supportFragmentManager.findFragmentByTag("feed_fragment") as? FeedFragment
+                    supportFragmentManager?.let {
+                        subredditBottomSheetFragment?.show(it, Constants.KEY_SUBREDDIT_BOTTOM_SHEET)
                     }
-//                    replaceFragment(FeedFragment.newInstance(true))
-                    Handler().postDelayed({
-                        bottom_navigation.menu.getItem(0).isCheckable = true
-                        bottom_navigation.menu.getItem(0).isChecked = true
-                    }, 1000)
-                    bottom_navigation.menu.getItem(1).isCheckable = false
-                    bottom_navigation.menu.getItem(1).isChecked = false
+                    feedFragment?.let {
+//                        (feedFragment as FeedFragment).openSubredditBottomSheet()
+                        subredditBottomSheetFragment.feedFragment = it
+                        Handler().postDelayed({
+                            bottom_navigation.menu.getItem(0).isCheckable = true
+                            bottom_navigation.menu.getItem(0).isChecked = true
+                        }, 1000)
+                        bottom_navigation.menu.getItem(1).isCheckable = false
+                        bottom_navigation.menu.getItem(1).isChecked = false
+                    } ?: run {
+//                        replaceFragment(FeedFragment.newInstance(true))
+                        Handler().postDelayed({
+                            bottom_navigation.menu.getItem(2).isCheckable = true
+                            bottom_navigation.menu.getItem(2).isChecked = true
+                        }, 1000)
+                        bottom_navigation.menu.getItem(1).isCheckable = false
+                        bottom_navigation.menu.getItem(1).isChecked = false
+                    }
                     true
                 }
 

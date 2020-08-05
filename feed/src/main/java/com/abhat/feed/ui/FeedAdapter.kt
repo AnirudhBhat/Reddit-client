@@ -80,7 +80,7 @@ open class FeedAdapter(
         this.sortType = sortType
         redditData?.let { redditData ->
             this.redditData?.addAll(redditData)
-            notifyItemChanged(redditData.size)
+            notifyDataSetChanged()
         }
     }
 

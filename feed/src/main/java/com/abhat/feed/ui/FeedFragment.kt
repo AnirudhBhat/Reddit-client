@@ -29,7 +29,7 @@ class FeedFragment : Fragment() {
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var feedAdapter: FeedAdapter? = null
     private var after: String = ""
-    private val SUBREDDIT = ""
+    private var SUBREDDIT = ""
     private var isFromSubreddit: Boolean? = null
 
     private var loading = false
@@ -41,9 +41,9 @@ class FeedFragment : Fragment() {
 
 
     companion object {
-        fun newInstance(fromSubreddit: Boolean = false): FeedFragment {
+        fun newInstance(subreddit: String = "frontpage"): FeedFragment {
             val bundle = Bundle()
-            bundle.putBoolean(Constants.IS_FROM_SUBREDDIT, fromSubreddit)
+            bundle.putString(Constants.SUBREDDIT, subreddit)
             val feedFragment = FeedFragment()
             feedFragment.arguments = bundle
             return feedFragment
@@ -54,15 +54,15 @@ class FeedFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val bundle = arguments
         bundle?.let { bundle ->
-            if (bundle.containsKey(Constants.IS_FROM_SUBREDDIT)) {
-                isFromSubreddit = bundle.getBoolean(Constants.IS_FROM_SUBREDDIT)
+            if (bundle.containsKey(Constants.SUBREDDIT)) {
+                SUBREDDIT = bundle.getString(Constants.SUBREDDIT, "frontpage")
             }
         }
-        isFromSubreddit?.let {
-            if (it) {
-                openSubredditBottomSheet()
-            }
-        }
+//        isFromSubreddit?.let {
+//            if (it) {
+//                openSubredditBottomSheet()
+//            }
+//        }
     }
 
     override fun onCreateView(
@@ -75,9 +75,10 @@ class FeedFragment : Fragment() {
         observeViewModel()
         feedViewModel.feedViewState.value?.let {
             bindUI(it)
-            if (it.isSubredditBottomSheetOpen) {
-                openSubredditBottomSheet()
-            }
+            bindThisFragmentToSubredditBottomSheet()
+//            if (it.isSubredditBottomSheetOpen) {
+//                openSubredditBottomSheet()
+//            }
             if (it.isSortBottomSheetOpen) {
                 openSortBottomSheet()
             }
@@ -88,8 +89,16 @@ class FeedFragment : Fragment() {
         return view
     }
 
+    private fun bindThisFragmentToSubredditBottomSheet() {
+        var subredditFragment =
+            activity?.supportFragmentManager?.findFragmentByTag(KEY_SUBREDDIT_BOTTOM_SHEET) as? SubredditBottomSheetFragment
+        subredditFragment?.let {
+            it.feedFragment = this
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
-        feedViewModel.subredditBottomSheetClosed()
+//        feedViewModel.subredditBottomSheetClosed()
 //        feedViewModel.sortBottomSheetClosed()
         super.onSaveInstanceState(outState)
     }
@@ -115,6 +124,7 @@ class FeedFragment : Fragment() {
         setProgressBarVisibility(feedViewState)
         if (!feedViewState.isLoading) {
             if (anyError(feedViewState)) {
+                loading = false
                 if (isNetworkError(feedViewState)) {
                     showErrorToast("oops, something went wrong!, please check your connection")
                 } else if (isAuthorizationError(feedViewState)) {
@@ -132,7 +142,7 @@ class FeedFragment : Fragment() {
                         feedViewState.feedList?.data?.children,
                         feedViewState.sortType
                     )
-                    feedRecyclerView?.scheduleLayoutAnimation()
+//                    feedRecyclerView?.scheduleLayoutAnimation()
                 }
                 loading = false
             }
@@ -231,7 +241,7 @@ class FeedFragment : Fragment() {
         subredditFragment?.let { subredditFragment ->
             subredditFragment?.feedFragment = this
             subredditFragment?.sortType = SortType.hot
-            feedViewModel.subredditBottomSheetOpened()
+            //feedViewModel.subredditBottomSheetOpened()
         } ?: run {
             subredditFragment = SubredditBottomSheetFragment()
             subredditFragment?.feedFragment = this
@@ -239,12 +249,12 @@ class FeedFragment : Fragment() {
             activity?.supportFragmentManager?.let {
                 subredditFragment?.show(it, KEY_SUBREDDIT_BOTTOM_SHEET)
             }
-            feedViewModel.subredditBottomSheetOpened()
+            //feedViewModel.subredditBottomSheetOpened()
         }
-        Handler().postDelayed({
-            subredditFragment?.dialog?.setOnCancelListener {
-                feedViewModel.subredditBottomSheetClosed()
-            }
-        }, 200)
+//        Handler().postDelayed({
+//            subredditFragment?.dialog?.setOnCancelListener {
+//                feedViewModel.subredditBottomSheetClosed()
+//            }
+//        }, 200)
     }
 }

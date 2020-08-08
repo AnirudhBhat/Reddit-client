@@ -19,3 +19,4 @@ private fun provideFeedViewModel(feedRepository: FeedRepositoryImpl,
                                  contextProvider: CoroutineContextProvider) = FeedViewModel(feedRepository, contextProvider)
 
 private fun provideFeedRepository(redditApi: RedditApi) = FeedRepositoryImpl(redditApi)
+

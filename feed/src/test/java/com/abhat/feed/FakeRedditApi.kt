@@ -41,13 +41,23 @@ class FakeRedditApi: RedditApi {
         return CompletableDeferred(FakeRedditResponse.returnRedditResponse())
     }
 
+    override fun getRedditFrontPageOauth(
+        headers: Map<String, String>,
+        sortType: String,
+        after: String
+    ): Deferred<RedditResponse> {
+        TODO("Not yet implemented")
+    }
+
     override fun getRedditListPost(
         headers: Map<String, String>,
         subreddit: String,
+        sortType: SortType,
         after: String
-    ): Deferred<PostDetailResponse> {
+    ): Deferred<RedditResponse> {
         TODO("Not yet implemented")
     }
+
 
     override fun getAccessToken(
         headers: Map<String, String>,

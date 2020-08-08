@@ -1,4 +1,4 @@
-package com.abhat.oauth
+package com.abhat.core.extensions
 
 import android.util.Base64
 

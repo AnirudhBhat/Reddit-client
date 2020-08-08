@@ -1,3 +1,4 @@
 include ':app', ':core', ':oauth', ':feed'
 rootProject.name='Reddit'
 include ':comment'
+include ':navigation'

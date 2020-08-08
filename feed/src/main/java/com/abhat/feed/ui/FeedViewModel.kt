@@ -1,16 +1,23 @@
 package com.abhat.feed.ui
 
 import android.widget.RelativeLayout
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhat.core.BuildConfig
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.extensions.encodeBase64ToString
+import com.abhat.core.model.TokenEntity
+import com.abhat.core.model.TokenResponse
 import com.abhat.feed.data.FeedRepository
 import com.abhat.feed.ui.state.FeedViewResult
 import com.abhat.feed.ui.state.FeedViewState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import java.util.*
 
 /**
  * Created by Anirudh Uppunda on 20,April,2020
@@ -22,6 +29,9 @@ open class FeedViewModel(
 
     private lateinit var sortTypeList: List<SortType>
     val feedViewState: MutableLiveData<FeedViewState> = MutableLiveData()
+
+    private val tokenResponseLiveData = MutableLiveData<TokenResponse>()
+    fun getTokenResponseLiveData() = tokenResponseLiveData as LiveData<TokenResponse>
 
     private var currentViewState = FeedViewState(subreddit = "all")
         set(value) {
@@ -55,12 +65,16 @@ open class FeedViewModel(
         currentViewState = currentViewState.copy(isSortBottomSheetOpen = false)
     }
 
-    fun getFeed(subreddit: String, after: String, sortType: SortType) {
+    fun getFeed(headers: HashMap<String, String> = hashMapOf(), subreddit: String, after: String, sortType: SortType, isOauth: Boolean = false) {
         showProgressBar()
         viewModelScope.launch(contextProvider.Main) {
             val feedViewResult =
                 withContext(viewModelScope.coroutineContext + contextProvider.IO) {
-                    feedRepository.getFeed(subreddit, after, sortType)
+                    if (isOauth) {
+                        feedRepository.getFeedOauth(headers, subreddit, after, sortType)
+                    } else {
+                        feedRepository.getFeed(subreddit, after, sortType)
+                    }
                 }
             feedViewResult?.let { feedViewResult ->
                 sortTypeList = if (shouldShowBestOptionInSortList(subreddit)) {
@@ -108,6 +122,28 @@ open class FeedViewModel(
         }
     }
 
+    fun retrieveAccessToken(headers: HashMap<String, String>, fields: HashMap<String, String>) {
+        currentViewState = currentViewState.copy(isLoading = true)
+        viewModelScope.launch(contextProvider.Main) {
+            supervisorScope {
+                try {
+                    val response =
+                        withContext(viewModelScope.coroutineContext + contextProvider.IO) {
+                            feedRepository.getAccessToken(
+                                headers,
+                                fields
+                            )
+                        }
+                    response?.let { tokenResponse ->
+                        tokenResponseLiveData.postValue(tokenResponse)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
 
 
     fun shouldShowBestOptionInSortList(subreddit: String? = null): Boolean {
@@ -136,5 +172,45 @@ open class FeedViewModel(
             return SortType.best
         }
         return sortType
+    }
+
+    fun howShouldWeFetchTheToken(tokenEntity: TokenEntity?): FetchTokenFrom {
+        return when {
+            tokenEntity == null -> FetchTokenFrom.USER_NOT_LOGGED_IN
+
+            isTokenExpired(tokenEntity.expiry) -> FetchTokenFrom.REFRESH_TOKEN_API
+
+            else -> FetchTokenFrom.SHARED_PREFERENCE
+        }
+    }
+
+    private fun isTokenExpired(tokenExpiry: Calendar?): Boolean {
+        tokenExpiry?.let { tokenExpiry ->
+            val now = Calendar.getInstance()
+            if (tokenExpiry.before(now)) {
+                return true
+            }
+            return false
+        } ?: run {
+            return false
+        }
+    }
+
+    fun refreshAccessToken(refreshToken: String) {
+        val headers = HashMap<String, String>()
+        val fields = HashMap<String, String>()
+        val auth = BuildConfig.CLIENT_ID.encodeBase64ToString()
+        headers["Authorization"] = "Basic $auth"
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+        fields["grant_type"] = "refresh_token"
+        fields["refresh_token"] = refreshToken
+
+        retrieveAccessToken(headers, fields)
+    }
+
+    enum class FetchTokenFrom {
+        SHARED_PREFERENCE,
+        USER_NOT_LOGGED_IN,
+        REFRESH_TOKEN_API
     }
 }

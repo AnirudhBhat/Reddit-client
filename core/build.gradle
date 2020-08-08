@@ -21,7 +21,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
 
-        buildConfigField("String", "CLIENT_ID", "\"client_id\"")// keyProperties['CLIENT_ID']
+        buildConfigField("String", "CLIENT_ID", "\"client_id\"")// keyProperties['CLIENT_ID']     "\"client_id\""
     }
 
     buildTypes {
@@ -46,6 +46,7 @@ dependencies {
     implementation lib.koinviewmodel
     implementation lib.retrofitlogging
     implementation lib.threetenabp
+    api lib.swiperefreshlayout
     api lib.recyclerview
     api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation lib.junit

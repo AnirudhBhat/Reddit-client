@@ -8,12 +8,11 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.abhat.core.BuildConfig
-import com.abhat.oauth.PreferenceHelper
+import com.abhat.core.common.PreferenceHelper
 import com.abhat.oauth.R
-import com.abhat.oauth.encodeBase64ToString
+import com.abhat.core.extensions.encodeBase64ToString
 import kotlinx.android.synthetic.main.activity_profile.*
 import org.koin.android.ext.android.inject
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 /**
@@ -61,8 +60,7 @@ class OauthActivity : AppCompatActivity() {
                 viewState.success.tokenResponse?.let { tokenResponse ->
                     oauthViewModel.getTokenEntity(
                         tokenResponse,
-                        OffsetDateTime.now().plusSeconds(tokenResponse.expiresIn.toLong())
-                    )
+                        oauthViewModel.mapTokenResponseExpiryToCalendarObject(tokenResponse.expiresIn, Calendar.getInstance()))
                 }
             }
 

@@ -65,13 +65,22 @@ class CommentsRepositoryTest {
         override fun getRedditListPost(
             headers: Map<String, String>,
             subreddit: String,
+            sortType: SortType,
             after: String
-        ): Deferred<PostDetailResponse> {
+        ): Deferred<RedditResponse> {
             TODO("Not yet implemented")
         }
 
         override fun getRedditFrontPage(
             @Path("sortType") sortType: String,
+            after: String
+        ): Deferred<RedditResponse> {
+            TODO("Not yet implemented")
+        }
+
+        override fun getRedditFrontPageOauth(
+            headers: Map<String, String>,
+            sortType: String,
             after: String
         ): Deferred<RedditResponse> {
             TODO("Not yet implemented")

@@ -2,6 +2,7 @@ package com.abhat.oauth.ui
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +10,14 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.abhat.core.BuildConfig
-import com.abhat.oauth.PreferenceHelper
+import com.abhat.core.common.PreferenceHelper
 import com.abhat.oauth.R
-import com.abhat.oauth.encodeBase64ToString
+import com.abhat.core.extensions.encodeBase64ToString
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_profile.*
 import org.koin.android.ext.android.inject
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 /**
@@ -44,7 +46,10 @@ class OauthFragment: BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.activity_profile, container, false)
+        val view = inflater.inflate(R.layout.activity_profile, container, false)
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        (dialog as BottomSheetDialog).behavior.peekHeight = 500
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,11 +62,18 @@ class OauthFragment: BottomSheetDialogFragment() {
     private fun observeViewModel() {
         oauthViewModel.viewState.observe(activity!!, androidx.lifecycle.Observer { viewState ->
             setProgressBarVisibility(viewState)
-            viewState.error?.let { throwable ->
-                showErrorToast("oops, something went wrong!")
-            } ?: run {
+            viewState?.success?.let {
                 storeAccessToken(viewState)
             }
+
+            viewState?.error?.let {
+                showErrorToast("oops, something went wrong!")
+            }
+//            viewState.error?.let { throwable ->
+//                showErrorToast("oops, something went wrong!")
+//            } ?: run {
+//                storeAccessToken(viewState)
+//            }
         })
     }
 
@@ -83,7 +95,7 @@ class OauthFragment: BottomSheetDialogFragment() {
                 viewState.success.tokenResponse?.let { tokenResponse ->
                     oauthViewModel.getTokenEntity(
                         tokenResponse,
-                        OffsetDateTime.now().plusSeconds(tokenResponse.expiresIn.toLong())
+                        oauthViewModel.mapTokenResponseExpiryToCalendarObject(tokenResponse.expiresIn, Calendar.getInstance())
                     )
                 }
             }
@@ -103,6 +115,7 @@ class OauthFragment: BottomSheetDialogFragment() {
                 if (oauthViewModel.isValid(url)) {
                     val uri = Uri.parse(url)
                     if (uri.getQueryParameter("state") == state) {
+                        Log.d("TAG", "url: " + url)
                         val authCode = uri.getQueryParameter("code")
                         val headersAndFields = populateHeadersAndFields(
                             authCode!!,
@@ -125,6 +138,9 @@ class OauthFragment: BottomSheetDialogFragment() {
         clientId: String,
         redirectUri: String
     ): Pair<HashMap<String, String>, HashMap<String, String>> {
+        Log.d("TAG", "authcode: " + authCode)
+        Log.d("TAG", "clientID: " + clientId)
+        Log.d("TAG", "redirectUri: " + redirectUri)
         val headers = HashMap<String, String>()
         val fields = HashMap<String, String>()
         val auth = clientId.encodeBase64ToString()

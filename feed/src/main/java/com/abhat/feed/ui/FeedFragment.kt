@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.common.PreferenceHelper
+import com.abhat.core.model.TokenEntity
+import com.abhat.core.model.TokenResponse
 import com.abhat.feed.R
 import com.abhat.feed.ui.constants.Constants
 import com.abhat.feed.ui.constants.Constants.KEY_SUBREDDIT_BOTTOM_SHEET
@@ -20,6 +23,8 @@ import com.abhat.feed.ui.state.FeedViewState
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by Anirudh Uppunda on 22,April,2020
@@ -84,7 +89,8 @@ class FeedFragment : Fragment() {
             }
         } ?: run {
             feedViewModel.showProgressBar()
-            feedViewModel.getFeed(SUBREDDIT, after, SortType.empty)
+
+            getFeed(SUBREDDIT, after, SortType.empty)
         }
         return view
     }
@@ -97,12 +103,6 @@ class FeedFragment : Fragment() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-//        feedViewModel.subredditBottomSheetClosed()
-//        feedViewModel.sortBottomSheetClosed()
-        super.onSaveInstanceState(outState)
-    }
-
     fun showProgressBar() {
         feedViewModel.showProgressBar()
     }
@@ -110,12 +110,50 @@ class FeedFragment : Fragment() {
     fun getFeed(subreddit: String, after: String, sortType: SortType) {
         feedViewModel.sortBottomSheetClosed()
         feedViewModel.subredditBottomSheetClosed()
-        feedViewModel.getFeed(subreddit, after, sortType)
+        val tokenEntity = PreferenceHelper.getTokenFromPrefs(requireActivity())
+        when (feedViewModel.howShouldWeFetchTheToken(tokenEntity)) {
+            FeedViewModel.FetchTokenFrom.USER_NOT_LOGGED_IN -> {
+                feedViewModel.getFeed(hashMapOf(), subreddit, after, sortType)
+            }
+
+            FeedViewModel.FetchTokenFrom.SHARED_PREFERENCE -> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
+                feedViewModel.getFeed(headers, subreddit, after, sortType, true)
+            }
+
+            FeedViewModel.FetchTokenFrom.REFRESH_TOKEN_API -> {
+                tokenEntity?.refresh_token?.let {
+                    feedViewModel.refreshAccessToken(it)
+                }
+            }
+        }
+    }
+
+    private fun mapToEntity(tokenResponse: TokenResponse): TokenEntity {
+        val tokenExpireTime = Calendar.getInstance()
+//        tokenExpireTime.add(Calendar.MILLISECOND, tokenResponse.expiresIn * 1000)
+        val tokenExpiryDate = Date(tokenResponse.expiresIn * 1000L)
+        tokenExpireTime.time = tokenExpiryDate
+        return TokenEntity(
+            tokenResponse.refreshToken,
+            tokenResponse.scope,
+            tokenResponse.accessToken,
+            tokenExpireTime,
+            1
+        )
     }
 
     private fun observeViewModel() {
         feedViewModel.feedViewState.observe(requireActivity(), Observer { feedViewState ->
             bindUI(feedViewState)
+        })
+
+        feedViewModel.getTokenResponseLiveData().observe(viewLifecycleOwner, Observer {
+            PreferenceHelper.storeToken(requireActivity(), mapToEntity(it))
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
+            feedViewModel.getFeed(headers, SUBREDDIT, after, SortType.empty)
         })
     }
 
@@ -193,7 +231,7 @@ class FeedFragment : Fragment() {
                         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                             feedViewModel.showProgressBar()
                             loading = true
-                            feedViewModel.getFeed(
+                            getFeed(
                                 currentFeedUiState.subreddit,
                                 after,
                                 currentFeedUiState.sortType

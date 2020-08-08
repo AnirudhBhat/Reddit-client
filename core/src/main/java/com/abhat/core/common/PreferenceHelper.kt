@@ -1,4 +1,4 @@
-package com.abhat.oauth
+package com.abhat.core.common
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -10,14 +10,18 @@ import com.google.gson.Gson
  */
 class PreferenceHelper {
     companion object {
-        fun getTokenFromPrefs(context: Context?): TokenEntity? {
+        fun getTokenFromPrefs(context: Context): TokenEntity? {
             val gson = Gson()
-            val json = getPreference(context!!).getString("token", "")
-            return gson.fromJson(json, TokenEntity::class.java!!)
+            val json = getPreference(
+                context
+            ).getString("token", "")
+            return gson.fromJson(json, TokenEntity::class.java)
         }
 
         fun storeToken(context: Context, token: TokenEntity) {
-            val prefsEditor = getPreference(context).edit()
+            val prefsEditor = getPreference(
+                context
+            ).edit()
             val gson = Gson()
             val json = gson.toJson(token)
             prefsEditor.putString("token", json)
@@ -25,12 +29,20 @@ class PreferenceHelper {
                 if (it.isNotEmpty()) {
                     prefsEditor.putString("refresh_token", token.refresh_token)
                 }
+            } ?: run {
+                prefsEditor.putString("refresh_token",
+                    getRefreshTokenFromPrefs(
+                        context
+                    )
+                )
             }
             prefsEditor.commit()
         }
 
         fun getRefreshTokenFromPrefs(context: Context): String? {
-            return getPreference(context).getString("refresh_token", "")
+            return getPreference(
+                context
+            ).getString("refresh_token", "")
         }
 
         fun getPreference(context: Context): SharedPreferences {

@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import com.abhat.core.FakeRedditResponse
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.model.TokenEntity
 import com.abhat.feed.data.FeedRepository
 import com.abhat.feed.ui.FeedViewModel
 import com.abhat.feed.ui.state.FeedViewResult
@@ -18,6 +19,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.*
 import kotlin.RuntimeException
 
 /**
@@ -241,5 +243,43 @@ class FeedViewModelTest {
         val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
 
         Assert.assertEquals(SortType.rising, feedViewModel.returnSortType(SortType.rising, "all"))
+    }
+
+    @Test
+    fun `when token is null, return constant to indicate that user has not logged in`() {
+        val tokenEntity = null
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        Assert.assertEquals(FeedViewModel.FetchTokenFrom.USER_NOT_LOGGED_IN, feedViewModel.howShouldWeFetchTheToken(tokenEntity))
+    }
+
+    @Test
+    fun `when token is expired, return constant to indicate that we have to make request to fetch refresh token`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val expiredTokenTime = Calendar.getInstance()
+        expiredTokenTime.add(Calendar.MINUTE, -5)
+        val tokenEntity = getFakeNewTokenEntity(expiredTokenTime)
+        Assert.assertEquals(FeedViewModel.FetchTokenFrom.REFRESH_TOKEN_API, feedViewModel.howShouldWeFetchTheToken(tokenEntity))
+    }
+
+    @Test
+    fun `when token is NOT expired, return constant to indicate that we have to fetch it from shared preference`() {
+        val feedRepository = FakeFeedRepositorySuccessResponse()
+        val feedViewModel = FeedViewModel(feedRepository, TestContextProvider())
+        val expiredTokenTime = Calendar.getInstance()
+        expiredTokenTime.add(Calendar.MINUTE, 5)
+        val tokenEntity = getFakeNewTokenEntity(expiredTokenTime)
+        Assert.assertEquals(FeedViewModel.FetchTokenFrom.SHARED_PREFERENCE, feedViewModel.howShouldWeFetchTheToken(tokenEntity))
+    }
+
+    private fun getFakeNewTokenEntity(expiry: Calendar): TokenEntity {
+        return TokenEntity(
+            refresh_token = "",
+            scope = "",
+            access_token = "",
+            expiry = expiry,
+            active = 0
+        )
     }
 }

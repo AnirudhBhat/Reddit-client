@@ -22,7 +22,14 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.profile -> {
-                    replaceFragment(OauthFragment())
+//                    replaceFragment(OauthFragment())
+                    supportFragmentManager?.let {
+                        OauthFragment().show(it, "oauth_bottom_sheet_fragment")
+                    }
+                    Handler().postDelayed({
+                        bottom_navigation.menu.getItem(2).isCheckable = false
+                        bottom_navigation.menu.getItem(2).isChecked = false
+                    }, 1000)
                     true
                 }
 

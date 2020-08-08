@@ -19,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
 import java.util.*
+import kotlin.math.exp
 
 /**
  * Created by Anirudh Uppunda on 12,March,2020
@@ -30,7 +31,7 @@ class OauthViewModelTest {
 
     private lateinit var oauthViewModel: com.abhat.oauth.ui.OauthViewModel
     private lateinit var accessTokenFetcherImpl: FakeAccessTokenFetcher
-    private lateinit var observer: Observer<com.abhat.oauth.ui.OauthViewModel.ViewState>
+    private lateinit var observer: Observer<OauthViewModel.ViewState>
 
     @Before
     fun setup() {
@@ -48,7 +49,7 @@ class OauthViewModelTest {
             val headers = populateHeadersAndFields().first
             val fields = populateHeadersAndFields().second
 
-            val successState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = false, success = com.abhat.oauth.ui.OauthViewModel.Success.GotTokenResponse(generateTokenResponse()), error = null)
+            val successState = OauthViewModel.ViewState(isLoading = false, success = com.abhat.oauth.ui.OauthViewModel.Success.GotTokenResponse(generateTokenResponse()), error = null)
 
             oauthViewModel.viewState.observeForever(observer)
 
@@ -64,8 +65,8 @@ class OauthViewModelTest {
             val headers = populateHeadersAndFields().first
             val fields = populateHeadersAndFields().second
 
-            val loadingState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = true, success = null, error = null)
-            val successState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = false, success = com.abhat.oauth.ui.OauthViewModel.Success.GotTokenResponse(generateTokenResponse()), error = null)
+            val loadingState = OauthViewModel.ViewState(isLoading = true, success = null, error = null)
+            val successState = OauthViewModel.ViewState(isLoading = false, success = com.abhat.oauth.ui.OauthViewModel.Success.GotTokenResponse(generateTokenResponse()), error = null)
 
             oauthViewModel.viewState.observeForever(observer)
 
@@ -87,8 +88,8 @@ class OauthViewModelTest {
 
             val throwable = RuntimeException("oops, something went wrong!")
 
-            val loadingState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = true, success = null, error = null)
-            val failureState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = false, success = null, error = throwable)
+            val loadingState = OauthViewModel.ViewState(isLoading = true, success = null, error = null)
+            val failureState = OauthViewModel.ViewState(isLoading = false, success = null, error = throwable)
 
             oauthViewModel.viewState.observeForever(observer)
 
@@ -107,11 +108,12 @@ class OauthViewModelTest {
     @Test
     fun `get token entity correctly`() {
         runBlocking {
-            val successState = com.abhat.oauth.ui.OauthViewModel.ViewState(isLoading = false, success = com.abhat.oauth.ui.OauthViewModel.Success.GotTokenEntity(mapToEntity(generateTokenResponse())), error = null)
+            val now = Calendar.getInstance()
+            val successState = OauthViewModel.ViewState(isLoading = false, success = OauthViewModel.Success.GotTokenEntity(mapToEntity(generateTokenResponse(), now)), error = null)
 
             oauthViewModel.viewState.observeForever(observer)
 
-            oauthViewModel.getTokenEntity(generateTokenResponse(), null)
+            oauthViewModel.getTokenEntity(generateTokenResponse(), now)
 
             verify(observer).onChanged(successState)
         }
@@ -157,6 +159,7 @@ class OauthViewModelTest {
         }
     }
 
+
     private fun populateHeadersAndFields(): Pair<HashMap<String, String>, HashMap<String, String>> {
         val headers = HashMap<String, String>()
         val fields = HashMap<String, String>()
@@ -179,8 +182,8 @@ class OauthViewModelTest {
         )
     }
 
-    private fun mapToEntity(tokenResponse: TokenResponse, expiry: OffsetDateTime? = null): TokenEntity {
-        return TokenEntity(tokenResponse.refreshToken, tokenResponse.scope, tokenResponse.accessToken, expiry, 1)
+    private fun mapToEntity(tokenResponse: TokenResponse, now: Calendar): TokenEntity {
+        return TokenEntity(tokenResponse.refreshToken, tokenResponse.scope, tokenResponse.accessToken, now, 1)
     }
 
     class TestContextProvider : CoroutineContextProvider() {

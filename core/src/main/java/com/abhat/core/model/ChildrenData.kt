@@ -9,6 +9,7 @@ import com.squareup.moshi.Json
 data class ChildrenData(
     var isGif: Boolean,
     var gifLink: String?,
+    var isThisNews: Boolean = false,
     var indent: Int,
     var shouldUseGlideForGif: Boolean = false,
     var imageUrl: String? = null,

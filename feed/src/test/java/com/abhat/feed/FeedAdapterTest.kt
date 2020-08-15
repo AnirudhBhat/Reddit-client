@@ -95,6 +95,13 @@ class FeedAdapterTest {
     }
 
     @Test
+    fun `reddit response with url which ends with v dot redd dot it and is not of type video is not a news and should return false`() {
+        runBlocking {
+            Assert.assertEquals(false, feedAdapter.isItNews(returnChildren("http://v.redd.it/qujasdh51", false), 0))
+        }
+    }
+
+    @Test
     fun `reddit response with url which DOES NOT ends with jpg or png and is not of type video, IS a news and should return true`() {
         runBlocking {
             Assert.assertEquals(true, feedAdapter.isItNews(returnChildren("http://www.testurl.com", false), 0))
@@ -311,6 +318,17 @@ class FeedAdapterTest {
         }
     }
 
+    @Test
+    fun `isItGifFromReddit must return true and should contain valid gifLink and shouldUseGlideForGif flag set`() {
+        runBlocking {
+            val response = returnChildren(secureMedia = returnSecureMedia())
+            val expectedResponse = response
+            Assert.assertTrue(feedAdapter.isItAGifFromReddit(response, 0))
+            Assert.assertEquals(response[0].data?.gifLink, "http://www.google.com/")
+            Assert.assertFalse(response[0].data?.shouldUseGlideForGif)
+        }
+    }
+
 
 
     class TestContextProvider : CoroutineContextProvider() {
@@ -337,10 +355,10 @@ class FeedAdapterTest {
     private fun returnChildren(url: String = "",
                                isVideo: Boolean = false,
                                domain: String = "",
-                               previewSize: Int = 5): MutableList<Children> {
+                               previewSize: Int = 5, secureMedia: SecureMedia? = null): MutableList<Children> {
         return mutableListOf<Children>(
             Children(
-                prepareAndReturnData(url, isVideo, domain, previewSize),
+                prepareAndReturnData(url, isVideo, domain, previewSize, secureMedia),
                 "",
                 1
             )
@@ -366,14 +384,29 @@ class FeedAdapterTest {
         )
     }
 
+    private fun returnSecureMedia(): SecureMedia {
+        return SecureMedia(
+            redditVideo = RedditVideo(
+                fallbackUrl = "",
+                dashUrl = "",
+                scrubberMediaUrl = "",
+                hlsUrl = "http://www.google.com/",
+                isGif = false
+            ),
+            oembed = null,
+            type = null
+        )
+    }
+
     private fun prepareAndReturnData(url: String = "",
                                      isVideo: Boolean = false, domain: String = "",
-                                     previewSize: Int = 5): ChildrenData {
+                                     previewSize: Int = 5, secureMedia: SecureMedia? = null): ChildrenData {
 
         return ChildrenData(false,
                 "",
-            0,
             false,
+            0,
+            true,
                 "",
                 true,
                 listOf(),
@@ -407,7 +440,7 @@ class FeedAdapterTest {
         null,
             domain = domain,
         isVideo = isVideo,
-        secureMedia = null)
+        secureMedia = secureMedia)
     }
 
     private fun returnPreview(size: Int): Preview? {

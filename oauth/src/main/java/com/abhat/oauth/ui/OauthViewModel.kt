@@ -125,8 +125,9 @@ class OauthViewModel(
     }
 
     fun mapTokenResponseExpiryToCalendarObject(expiresIn: Int, tokenExpireTime: Calendar): Calendar {
-        val tokenExpiryDate = Date(expiresIn * 1000L)
+        val tokenExpiryDate = Date()
         tokenExpireTime.time = tokenExpiryDate
+        tokenExpireTime.add(Calendar.SECOND, expiresIn)
         return tokenExpireTime
     }
 

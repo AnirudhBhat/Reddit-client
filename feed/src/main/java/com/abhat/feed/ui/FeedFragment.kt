@@ -2,6 +2,7 @@ package com.abhat.feed.ui
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.common.PreferenceHelper
+import com.abhat.core.extensions.encodeBase64ToString
 import com.abhat.core.model.TokenEntity
 import com.abhat.core.model.TokenResponse
 import com.abhat.feed.R
@@ -125,6 +127,11 @@ class FeedFragment : Fragment() {
             FeedViewModel.FetchTokenFrom.REFRESH_TOKEN_API -> {
                 tokenEntity?.refresh_token?.let {
                     feedViewModel.refreshAccessToken(it)
+                } ?: run {
+                    val refreshToken = PreferenceHelper.getRefreshTokenFromPrefs(requireActivity())
+                    refreshToken?.let {
+                        feedViewModel.refreshAccessToken(it)
+                    }
                 }
             }
         }
@@ -132,9 +139,9 @@ class FeedFragment : Fragment() {
 
     private fun mapToEntity(tokenResponse: TokenResponse): TokenEntity {
         val tokenExpireTime = Calendar.getInstance()
-//        tokenExpireTime.add(Calendar.MILLISECOND, tokenResponse.expiresIn * 1000)
-        val tokenExpiryDate = Date(tokenResponse.expiresIn * 1000L)
+        val tokenExpiryDate = Date()
         tokenExpireTime.time = tokenExpiryDate
+        tokenExpireTime.add(Calendar.SECOND, tokenResponse.expiresIn)
         return TokenEntity(
             tokenResponse.refreshToken,
             tokenResponse.scope,
@@ -153,7 +160,7 @@ class FeedFragment : Fragment() {
             PreferenceHelper.storeToken(requireActivity(), mapToEntity(it))
             val headers = HashMap<String, String>()
             headers["Authorization"] = "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
-            feedViewModel.getFeed(headers, SUBREDDIT, after, SortType.empty)
+            feedViewModel.getFeed(headers, SUBREDDIT, after, SortType.empty, true)
         })
     }
 

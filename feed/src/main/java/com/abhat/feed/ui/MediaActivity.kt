@@ -1,5 +1,6 @@
 package com.abhat.feed.ui
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -56,6 +57,7 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
         val imageHeight = intent.getIntExtra("imageHeight", 300)
+        var gifUrl = intent.getStringExtra("gif_url")
         var url = intent.getStringExtra("url")
         var imageUrl = intent.getStringExtra("imageUrl")
         var shouldUseGlide = intent.getBooleanExtra("shoulduseglide", false)
@@ -65,22 +67,43 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         image.layoutParams.height = imageHeight
         exoplayer.layoutParams.height = imageHeight
 
-        if (mediaClassManager.isUrlFromImgurAndIsGif(url)) {
-            url = mediaClassManager.replaceImgurGifUrlWithMp4(url)
-            shouldUseGlide = false
-        }
-        if (shouldUseGlide) {
-            image.visibility = View.VISIBLE
-            exoplayer.visibility = View.GONE
-            controls.visibility = View.GONE
-            loadImage(url)
-        } else {
-            loadImage(imageUrl)
-            url?.let { url ->
-                prepareExoPlayer()
-                initExoPlayerr(url, exoplayer)
+        gifUrl?.let { gifUrl ->
+            var imgurUrlModified = ""
+            if (mediaClassManager.isUrlFromImgurAndIsGif(gifUrl)) {
+                imgurUrlModified = mediaClassManager.replaceImgurGifUrlWithMp4(gifUrl)
+                loadImage(imageUrl)
+                imgurUrlModified?.let { url ->
+                    prepareExoPlayer()
+                    initExoPlayerr(url, exoplayer)
+                }
+            } else {
+                if (shouldUseGlide) {
+                    image.visibility = View.VISIBLE
+                    exoplayer.visibility = View.GONE
+                    controls.visibility = View.GONE
+                    loadImage(gifUrl)
+                } else {
+                    loadImage(imageUrl)
+                    gifUrl?.let { url ->
+                        prepareExoPlayer()
+                        initExoPlayerr(url, exoplayer)
+                    }
+                }
+            }
+        } ?: run {
+            imageUrl?.let {
+                image.visibility = View.VISIBLE
+                exoplayer.visibility = View.GONE
+                controls.visibility = View.GONE
+                loadImage(imageUrl)
+            } ?: run {
+                openUrl(url)
             }
         }
+    }
+
+    private fun openUrl(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
     private fun loadImage(url: String) {

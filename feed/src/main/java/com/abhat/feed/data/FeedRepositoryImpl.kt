@@ -95,6 +95,7 @@ open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository, KoinCom
         headers: HashMap<String, String>,
         fields: HashMap<String, String>
     ): TokenResponse? {
+        hostSelectionInterceptor.host = "www.reddit.com"
         val response = redditApi.getAccessToken(headers, fields).await()
         return response.body()
     }

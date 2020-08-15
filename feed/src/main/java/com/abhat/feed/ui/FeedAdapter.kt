@@ -1,6 +1,7 @@
 package com.abhat.feed.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.text.Html
 import android.text.format.DateUtils
 import android.util.Log
@@ -132,12 +133,15 @@ open class FeedAdapter(
             val url = redditData?.get(position)?.data?.url ?: ""
             val isVideo = redditData?.get(position)?.data?.isVideo!!
             withContext(mainScope.coroutineContext) {
-                (!url.endsWith(".jpg")
+                val result = (!url.endsWith(".jpg")
                         && !url.endsWith(".png")
                         && !url.contains("gifv")
                         && !url.contains("gif")
                         && !url.contains("gfycat")
+                        && !url.contains("v.redd.it")
                         && !isVideo)
+                if (result) redditData?.get(position).data?.isThisNews = true
+                result
             }
         }
     }
@@ -223,14 +227,30 @@ open class FeedAdapter(
                             data?.shouldUseGlideForGif = false
                             data?.url?.contains("v.redd.it") ?: false
                         } ?: run {
-                            data?.gifLink = data?.url
-                            data?.shouldUseGlideForGif = true
-                            data?.url?.contains("v.redd.it") ?: false
+                            if (data?.url?.contains("v.redd.it") == true) {
+                                data?.gifLink = data?.url
+                                data?.shouldUseGlideForGif = true
+                                true
+                            } else {
+                                data?.gifLink = null
+                                data?.shouldUseGlideForGif = false
+                                false
+                            }
+//                            data?.url?.contains("v.redd.it") ?: false
                         }
                     } else {
-                        data?.gifLink = data?.url
-                        data?.shouldUseGlideForGif = true
-                        data?.url?.contains("v.redd.it") ?: false
+//                        data?.gifLink = data?.url
+//                        data?.shouldUseGlideForGif = true
+//                        data?.url?.contains("v.redd.it") ?: false
+                        if (data?.url?.contains("v.redd.it") == true) {
+                            data?.gifLink = data?.url
+                            data?.shouldUseGlideForGif = true
+                            true
+                        } else {
+                            data?.gifLink = null
+                            data?.shouldUseGlideForGif = false
+                            false
+                        }
                     }
                 }
             } else {
@@ -341,22 +361,27 @@ open class FeedAdapter(
         init {
             with (itemView) {
                 iv_image.setOnClickListener {
-                    val intent =
-                        Intent(this@FeedAdapter.context, MediaActivity::class.java)
-                    val options: ActivityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as FragmentActivity,
-                            (iv_image as View),
-                            "transition_image"
+                    if (redditData?.get(position - 1)?.data?.isThisNews == true) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(redditData?.get(position - 1)?.data?.url)))
+                    } else {
+                        val intent =
+                            Intent(this@FeedAdapter.context, MediaActivity::class.java)
+                        val options: ActivityOptionsCompat =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                context as FragmentActivity,
+                                (iv_image as View),
+                                "transition_image"
+                            )
+                        intent.putExtra("imageHeight", iv_image.height)
+                        intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
+                        intent.putExtra("gif_url", redditData?.get(position - 1)?.data?.gifLink)
+                        intent.putExtra("url", redditData?.get(position - 1)?.data?.url)
+                        intent.putExtra(
+                            "shoulduseglide",
+                            redditData?.get(position - 1)?.data?.shouldUseGlideForGif
                         )
-                    intent.putExtra("imageHeight", iv_image.height)
-                    intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
-                    intent.putExtra("url", redditData?.get(position - 1)?.data?.gifLink)
-                    intent.putExtra(
-                        "shoulduseglide",
-                        redditData?.get(position - 1)?.data?.shouldUseGlideForGif
-                    )
-                    context.startActivity(intent, options.toBundle())
+                        context.startActivity(intent, options.toBundle())
+                    }
                 }
 
                 reddit_card_layout.setOnClickListener {

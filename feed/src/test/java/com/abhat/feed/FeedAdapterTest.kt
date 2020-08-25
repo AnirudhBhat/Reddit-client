@@ -321,7 +321,7 @@ class FeedAdapterTest {
     @Test
     fun `isItGifFromReddit must return true and should contain valid gifLink and shouldUseGlideForGif flag set`() {
         runBlocking {
-            val response = returnChildren(secureMedia = returnSecureMedia())
+            val response = returnChildren(secureMedia = returnSecureMedia(url = "http://www.google.com/", type = null))
             val expectedResponse = response
             Assert.assertTrue(feedAdapter.isItAGifFromReddit(response, 0))
             Assert.assertEquals(response[0].data?.gifLink, "http://www.google.com/")
@@ -402,7 +402,7 @@ class FeedAdapterTest {
         )
     }
 
-    private fun returnSecureMedia(url: String = "http://www.google.com/", type: String = ""): SecureMedia {
+    private fun returnSecureMedia(url: String = "http://www.google.com/", type: String? = null): SecureMedia {
         return SecureMedia(
             redditVideo = RedditVideo(
                 fallbackUrl = "",

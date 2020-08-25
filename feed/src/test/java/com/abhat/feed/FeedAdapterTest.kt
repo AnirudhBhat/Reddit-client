@@ -329,6 +329,24 @@ class FeedAdapterTest {
         }
     }
 
+    @Test
+    fun `isItGifFromGfyCat must return false if type in secure media does not contain word 'gfycat'`() {
+        runBlocking {
+            val response = returnChildren(secureMedia = returnSecureMedia(url = "https://www.google.com/asdasdff"))
+            val expectedResponse = response
+            Assert.assertFalse(feedAdapter.isItAGifFromGfycat(response, 0))
+        }
+    }
+
+    @Test
+    fun `isItGifFromGfyCat must return true if type in secure media does contains word 'gfycat'`() {
+        runBlocking {
+            val response = returnChildren(secureMedia = returnSecureMedia(url = "https://www.asdgfycat.com/asdasdff", type = "gfycat"))
+            val expectedResponse = response
+            Assert.assertTrue(feedAdapter.isItAGifFromGfycat(response, 0))
+        }
+    }
+
 
 
     class TestContextProvider : CoroutineContextProvider() {
@@ -384,17 +402,17 @@ class FeedAdapterTest {
         )
     }
 
-    private fun returnSecureMedia(): SecureMedia {
+    private fun returnSecureMedia(url: String = "http://www.google.com/", type: String = ""): SecureMedia {
         return SecureMedia(
             redditVideo = RedditVideo(
                 fallbackUrl = "",
                 dashUrl = "",
                 scrubberMediaUrl = "",
-                hlsUrl = "http://www.google.com/",
+                hlsUrl = url,
                 isGif = false
             ),
             oembed = null,
-            type = null
+            type = type
         )
     }
 

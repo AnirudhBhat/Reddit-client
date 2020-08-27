@@ -347,6 +347,30 @@ class FeedAdapterTest {
         }
     }
 
+    @Test
+    fun `isItAGifFromOtherSource must return true if the source is not from reddit or gfycat but it is a gif`() {
+        runBlocking {
+            val response = returnChildren(url = "http://www.google.gif", secureMedia = returnSecureMedia(url = "http://www.google.gif", type = ""))
+            Assert.assertTrue(feedAdapter.isItGifFromOtherSource(response, 0))
+        }
+    }
+
+    @Test
+    fun `isItAGifFromOtherSource must return false if the source is from reddit`() {
+        runBlocking {
+            val response = returnChildren(url = "http://www.google.gif", secureMedia = returnSecureMedia(url = "http://www.google.gif", type = null))
+            Assert.assertFalse(feedAdapter.isItGifFromOtherSource(response, 0))
+        }
+    }
+
+    @Test
+    fun `isItAGifFromOtherSource must return false if the source is from gfycat`() {
+        runBlocking {
+            val response = returnChildren(url = "http://www.google.gif", secureMedia = returnSecureMedia(url = "http://www.google.gif", type = "gfycat"))
+            Assert.assertFalse(feedAdapter.isItGifFromOtherSource(response, 0))
+        }
+    }
+
 
 
     class TestContextProvider : CoroutineContextProvider() {

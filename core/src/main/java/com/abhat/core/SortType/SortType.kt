@@ -12,5 +12,7 @@ enum class SortType {
     @SerializedName("new")
     new,
     @SerializedName("rising")
-    rising
+    rising,
+    @SerializedName("saved")
+    saved
 }

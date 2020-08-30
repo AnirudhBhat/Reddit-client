@@ -114,7 +114,7 @@ class CommentsRepositoryTest {
             TODO("Not yet implemented")
         }
 
-        override fun getSavedPosts(headers: Map<String, String>): Deferred<PostDetailResponse> {
+        override fun getSavedPosts(headers: Map<String, String>, after: String): Deferred<RedditResponse> {
             TODO("Not yet implemented")
         }
 

@@ -28,6 +28,10 @@ open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository, KoinCom
                     SortType.hot, SortType.best, SortType.rising, SortType.new -> {
                         redditApi.getRedditFrontPage(sortType.name, after).await()
                     }
+
+                    else ->  {
+                        redditApi.getRedditFrontPage(sortType.name, after).await()
+                    }
                 }
             } else {
                 redditApi.getRedditList(subreddit, sortType, after).await()
@@ -67,6 +71,10 @@ open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository, KoinCom
 
                     SortType.hot, SortType.best, SortType.rising, SortType.new -> {
                         redditApi.getRedditFrontPageOauth(headers, sortType.name, after).await()
+                    }
+
+                    SortType.saved -> {
+                        redditApi.getSavedPosts(headers, after).await()
                     }
                 }
             } else {

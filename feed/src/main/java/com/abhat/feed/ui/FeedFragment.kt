@@ -16,8 +16,7 @@ import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.common.PreferenceHelper
 import com.abhat.core.extensions.encodeBase64ToString
-import com.abhat.core.model.TokenEntity
-import com.abhat.core.model.TokenResponse
+import com.abhat.core.model.*
 import com.abhat.feed.R
 import com.abhat.feed.ui.constants.Constants
 import com.abhat.feed.ui.constants.Constants.KEY_SUBREDDIT_BOTTOM_SHEET
@@ -26,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -37,20 +37,26 @@ class FeedFragment : Fragment() {
     private var feedAdapter: FeedAdapter? = null
     private var after: String = ""
     private var SUBREDDIT = ""
+    private var SOURCE = ""
     private var isFromSubreddit: Boolean? = null
 
     private var loading = false
     var pastVisiblesItems: Int = 0
     var visibleItemCount: Int = 0
     var totalItemCount: Int = 0
+    private var configChangeHandled: Boolean = false
     private lateinit var currentFeedUiState: FeedViewState
     private val feedViewModel: FeedViewModel by viewModel()
 
 
     companion object {
-        fun newInstance(subreddit: String = "frontpage"): FeedFragment {
+        fun newInstance(
+            subreddit: String = "frontpage",
+            source: String = "frontpage"
+        ): FeedFragment {
             val bundle = Bundle()
             bundle.putString(Constants.SUBREDDIT, subreddit)
+            bundle.putString(Constants.SOURCE, source)
             val feedFragment = FeedFragment()
             feedFragment.arguments = bundle
             return feedFragment
@@ -64,12 +70,21 @@ class FeedFragment : Fragment() {
             if (bundle.containsKey(Constants.SUBREDDIT)) {
                 SUBREDDIT = bundle.getString(Constants.SUBREDDIT, "frontpage")
             }
+
+            if (bundle.containsKey(Constants.SOURCE)) {
+                SOURCE = bundle.getString(Constants.SOURCE, "frontpage")
+            }
         }
 //        isFromSubreddit?.let {
 //            if (it) {
 //                openSubredditBottomSheet()
 //            }
 //        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        observeViewModel()
     }
 
     override fun onCreateView(
@@ -79,22 +94,50 @@ class FeedFragment : Fragment() {
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_feed, container, false)
         setupRecyclerView(view)
-        observeViewModel()
-        feedViewModel.feedViewState.value?.let {
-            bindUI(it)
-            bindThisFragmentToSubredditBottomSheet()
-//            if (it.isSubredditBottomSheetOpen) {
-//                openSubredditBottomSheet()
-//            }
-            if (it.isSortBottomSheetOpen) {
-                openSortBottomSheet()
-            }
+        savedInstanceState?.let {
+            configChangeHandled = true
+            val state = feedViewModel.feedViewState.value
+            val redditList = it.getParcelableArrayList<Children>("redditList") as List<Children>
+            bindUI(state!!, redditList)
         } ?: run {
-            feedViewModel.showProgressBar()
+            if (!configChangeHandled) {
+                feedViewModel.showProgressBar()
 
-            getFeed(SUBREDDIT, after, SortType.empty)
+                if (SOURCE.equals("profile", true)) {
+                    getFeed(SUBREDDIT, after, SortType.saved)
+                } else {
+                    getFeed(SUBREDDIT, after, SortType.empty)
+                }
+            }
         }
+//        feedViewModel.feedViewState.value?.let {
+//            bindUI(it)
+//            bindThisFragmentToSubredditBottomSheet()
+////            if (it.isSubredditBottomSheetOpen) {
+////                openSubredditBottomSheet()
+////            }
+//            if (it.isSortBottomSheetOpen) {
+//                openSortBottomSheet()
+//            }
+//        } ?: run {
+//            if (!configChangeHandled) {
+//                feedViewModel.showProgressBar()
+//
+//                if (SOURCE.equals("profile", true)) {
+//                    getFeed(SUBREDDIT, after, SortType.saved)
+//                } else {
+//                    getFeed(SUBREDDIT, after, SortType.empty)
+//                }
+//            }
+//        }
         return view
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        feedAdapter?.getRedditData()?.let {
+            outState.putParcelableArrayList("redditList", ArrayList(it))
+        }
     }
 
     private fun bindThisFragmentToSubredditBottomSheet() {
@@ -120,7 +163,8 @@ class FeedFragment : Fragment() {
 
             FeedViewModel.FetchTokenFrom.SHARED_PREFERENCE -> {
                 val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
+                headers["Authorization"] =
+                    "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
                 feedViewModel.getFeed(headers, subreddit, after, sortType, true)
             }
 
@@ -152,19 +196,23 @@ class FeedFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        feedViewModel.feedViewState.observe(requireActivity(), Observer { feedViewState ->
-            bindUI(feedViewState)
+        feedViewModel.feedViewState.observe(viewLifecycleOwner, Observer { feedViewState ->
+            if (!configChangeHandled) {
+                bindUI(feedViewState)
+            }
+            configChangeHandled = false
         })
 
         feedViewModel.getTokenResponseLiveData().observe(viewLifecycleOwner, Observer {
             PreferenceHelper.storeToken(requireActivity(), mapToEntity(it))
             val headers = HashMap<String, String>()
-            headers["Authorization"] = "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
+            headers["Authorization"] =
+                "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
             feedViewModel.getFeed(headers, SUBREDDIT, after, SortType.empty, true)
         })
     }
 
-    private fun bindUI(feedViewState: FeedViewState) {
+    private fun bindUI(feedViewState: FeedViewState, redditList: List<Children>? = null) {
         currentFeedUiState = feedViewState
         setProgressBarVisibility(feedViewState)
         if (!feedViewState.isLoading) {
@@ -176,20 +224,27 @@ class FeedFragment : Fragment() {
                     showErrorToast("Please sign in to use this feature")
                 }
             } else {
-                after = feedViewState?.feedList?.data?.after ?: ""
-                if (loading) {
-                    feedAdapter?.addRedditData(
-                        feedViewState.feedList?.data?.children,
+                if (!redditList.isNullOrEmpty()) {
+                    feedAdapter?.updateRedditData(
+                        redditList.toMutableList(),
                         feedViewState.sortType
                     )
                 } else {
-                    feedAdapter?.updateRedditData(
-                        feedViewState.feedList?.data?.children,
-                        feedViewState.sortType
-                    )
+                    after = feedViewState?.feedList?.data?.after ?: ""
+                    if (loading) {
+                        feedAdapter?.addRedditData(
+                            feedViewState.feedList?.data?.children,
+                            feedViewState.sortType
+                        )
+                    } else {
+                        feedAdapter?.updateRedditData(
+                            feedViewState.feedList?.data?.children,
+                            feedViewState.sortType
+                        )
 //                    feedRecyclerView?.scheduleLayoutAnimation()
+                    }
+                    loading = false
                 }
-                loading = false
             }
         }
     }

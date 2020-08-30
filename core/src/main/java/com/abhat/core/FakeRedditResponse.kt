@@ -33,7 +33,6 @@ object FakeRedditResponse {
             kind = "",
             data = Data(
                 null,
-                null,
                 mutableListOf<Children>(
                     Children(
                         prepareAndReturnData(
@@ -86,7 +85,6 @@ object FakeRedditResponse {
                         childrenIndex = 4
                     )
                 ),
-                "",
                 ""
             )
         )
@@ -192,7 +190,6 @@ object FakeRedditResponse {
                 kind = "",
                 data = Data(
                     null,
-                    null,
                     mutableListOf<Children>(
                         Children(
                             prepareAndReturnData(
@@ -202,14 +199,12 @@ object FakeRedditResponse {
                             1
                         )
                     ),
-                    "",
                     ""
                 )
             ),
             RedditResponse(
             kind = "",
             data = Data(
-                null,
                 null,
                 mutableListOf<Children>(
                     Children(
@@ -263,7 +258,6 @@ object FakeRedditResponse {
                         childrenIndex = 4
                     )
                 ),
-                "",
                 ""
             )
         ))
@@ -320,7 +314,6 @@ object FakeRedditResponse {
             kind = "",
             data = Data(
                 null,
-                null,
                 mutableListOf<Children>(
                     Children(
                         prepareAndReturnData(),
@@ -329,7 +322,6 @@ object FakeRedditResponse {
                         isParentComment = false
                     )
                 ),
-                "",
                 ""
             )
         )

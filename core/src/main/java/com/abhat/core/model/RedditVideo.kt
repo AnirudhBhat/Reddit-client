@@ -1,10 +1,13 @@
 package com.abhat.core.model
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Anirudh Uppunda on 04,May,2020
  */
+@Parcelize
 data class RedditVideo(
     @field:Json(name="fallback_url")
     val fallbackUrl:String?,
@@ -16,4 +19,4 @@ data class RedditVideo(
     val hlsUrl:String?,
     @field:Json(name="is_gif")
     val isGif:Boolean?
-)
+): Parcelable

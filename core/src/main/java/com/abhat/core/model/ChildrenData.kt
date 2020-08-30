@@ -1,11 +1,14 @@
 package com.abhat.core.model
 
+import android.os.Parcelable
 import com.abhat.core.PointsFormatter
 import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Anirudh Uppunda on 04,May,2020
  */
+@Parcelize
 data class ChildrenData(
     var isGif: Boolean,
     var gifLink: String?,
@@ -16,7 +19,7 @@ data class ChildrenData(
     @field:Json(name="over_18")
     val over18: Boolean? = null,
     @field:Json(name = "crosspost_parent_list")
-    val crossPost: List<CrossPost>,
+    val crossPost: List<CrossPost>?,
     @field:Json(name = "saved")
     var saved:Boolean,
     @field:Json(name = "upvoted")
@@ -24,7 +27,7 @@ data class ChildrenData(
     @field:Json(name = "downvoted")
     var downvoted:Boolean,
     @field:Json(name = "likes")
-    var likes:Any,
+    var likes:String?,
     @field:Json(name = "subreddit")
     val subreddit:String,
     @field:Json(name = "subreddit_id")
@@ -48,7 +51,7 @@ data class ChildrenData(
     @field:Json(name = "depth")
     val depth: Int,
     @field:Json(name = "id")
-    val id: String,
+    val id: String?,
     @field:Json(name = "is_submitter")
     val isSubmitter: Boolean,
     @field:Json(name = "name")
@@ -79,4 +82,4 @@ data class ChildrenData(
     val isVideo: Boolean = false,
     @field:Json(name="domain")
     val domain: String
-)
+): Parcelable

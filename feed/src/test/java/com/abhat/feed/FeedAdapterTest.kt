@@ -381,7 +381,6 @@ class FeedAdapterTest {
     private fun returnData(): Data {
         return Data(
             null,
-            null,
             mutableListOf<Children>(
                 Children(
                     prepareAndReturnData(),
@@ -389,7 +388,6 @@ class FeedAdapterTest {
                     1
                 )
             ),
-            "",
             ""
         )
     }
@@ -412,7 +410,6 @@ class FeedAdapterTest {
             kind = "",
             data = Data(
                 null,
-                null,
                 mutableListOf<Children>(
                     Children(
                     prepareAndReturnData(url = url),
@@ -420,7 +417,6 @@ class FeedAdapterTest {
                         1
                 )
                 ),
-                "",
                 ""
             )
         )

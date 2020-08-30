@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.abhat.core.common.PreferenceHelper
 import com.abhat.feed.ui.FeedFragment
 import com.abhat.feed.ui.SubredditBottomSheetFragment
 import com.abhat.feed.ui.constants.Constants
@@ -23,14 +24,19 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.profile -> {
 //                    replaceFragment(OauthFragment())
-                    supportFragmentManager?.let {
-                        OauthFragment().show(it, "oauth_bottom_sheet_fragment")
+                    PreferenceHelper.getTokenFromPrefs(this)?.let {
+                        replaceFragment(FeedFragment.newInstance(source = "profile"), "feed_fragment")
+                        true
+                    } ?: run {
+                        supportFragmentManager?.let {
+                            OauthFragment().show(it, "oauth_bottom_sheet_fragment")
+                        }
+                        Handler().postDelayed({
+                            bottom_navigation.menu.getItem(2).isCheckable = false
+                            bottom_navigation.menu.getItem(2).isChecked = false
+                        }, 1000)
+                        true
                     }
-                    Handler().postDelayed({
-                        bottom_navigation.menu.getItem(2).isCheckable = false
-                        bottom_navigation.menu.getItem(2).isChecked = false
-                    }, 1000)
-                    true
                 }
 
                 R.id.front_page -> {

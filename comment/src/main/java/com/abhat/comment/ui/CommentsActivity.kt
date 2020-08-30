@@ -117,7 +117,9 @@ class CommentsActivity: AppCompatActivity() {
                     children.childrenIndex = childrenIndex
                 }
                 children.indent = indent
-                printRedditComments((children.data.replies as RedditResponse).data.children)
+                (children?.data?.replies as? RedditResponse)?.data?.children?.let {
+                    printRedditComments(it)
+                }
             } else {
                 indent = getIndent(children.data.depth, indent)
                 if (indent == 5) {

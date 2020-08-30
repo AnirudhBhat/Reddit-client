@@ -41,6 +41,9 @@ interface RedditApi {
                           @Path("sortType") sortType: SortType,
                           @Query("after") after: String = ""): Deferred<RedditResponse>
 
+    @GET("user/{user_name}/saved/")
+    fun getSavedPosts(@HeaderMap headers: Map<String, String>, @Query("after") after: String = ""): Deferred<RedditResponse>
+
 //    @GET("hot.json?")
 //    fun getRedditFrontPage(@HeaderMap headers: Map<String, String>,
 //                          @Query("after") after: String = ""): Deferred<PostDetailResponse>
@@ -64,9 +67,7 @@ interface RedditApi {
     @POST("api/vote/")
     fun vote(@HeaderMap headers: Map<String, String>,
              @FieldMap fields: Map<String, String>): Deferred<Response<Void>>
-
-    @GET("user/kernel_pan1c/saved/")
-    fun getSavedPosts(@HeaderMap headers: Map<String, String>): Deferred<PostDetailResponse>
+    
 
     @GET("user/kernel_pan1c/upvoted/")
     fun getUpvotedPosts(@HeaderMap headers: Map<String, String>): Deferred<PostDetailResponse>

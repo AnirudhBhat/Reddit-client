@@ -9,6 +9,8 @@ import com.abhat.core.BuildConfig
 import com.abhat.core.SortType.SortType
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.extensions.encodeBase64ToString
+import com.abhat.core.model.Children
+import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenEntity
 import com.abhat.core.model.TokenResponse
 import com.abhat.feed.data.FeedRepository
@@ -29,6 +31,7 @@ open class FeedViewModel(
 
     private lateinit var sortTypeList: List<SortType>
     val feedViewState: MutableLiveData<FeedViewState> = MutableLiveData()
+    var feedList: RedditResponse? = null
 
     private val tokenResponseLiveData = MutableLiveData<TokenResponse>()
     fun getTokenResponseLiveData() = tokenResponseLiveData as LiveData<TokenResponse>
@@ -54,18 +57,24 @@ open class FeedViewModel(
     }
 
     fun subredditBottomSheetClosed() {
-        currentViewState = currentViewState.copy(isSubredditBottomSheetOpen = false)
+        //currentViewState = currentViewState.copy(isSubredditBottomSheetOpen = false)
     }
 
     fun sortBottomSheetOpened() {
-        currentViewState = currentViewState.copy(isSortBottomSheetOpen = true)
+        //currentViewState = currentViewState.copy(isSortBottomSheetOpen = true)
     }
 
     fun sortBottomSheetClosed() {
-        currentViewState = currentViewState.copy(isSortBottomSheetOpen = false)
+        //currentViewState = currentViewState.copy(isSortBottomSheetOpen = false)
     }
 
-    fun getFeed(headers: HashMap<String, String> = hashMapOf(), subreddit: String, after: String, sortType: SortType, isOauth: Boolean = false) {
+    fun getFeed(
+        headers: HashMap<String, String> = hashMapOf(),
+        subreddit: String,
+        after: String,
+        sortType: SortType,
+        isOauth: Boolean = false
+    ) {
         showProgressBar()
         viewModelScope.launch(contextProvider.Main) {
             val feedViewResult =
@@ -83,6 +92,16 @@ open class FeedViewModel(
                     returnSortTypeListWithoutBestOption()
                 }
                 when (feedViewResult) {
+                    is FeedViewResult.LoadingState -> {
+                        currentViewState.copy(
+                            isLoading = true,
+                            subreddit = subreddit,
+                            sortType = returnSortType(sortType, subreddit),
+                            sortList = sortTypeList,
+                            error = null
+                        )
+                    }
+
                     is FeedViewResult.Success -> {
                         currentViewState = currentViewState.copy(
                             isLoading = false,
@@ -145,9 +164,11 @@ open class FeedViewModel(
     }
 
 
-
     fun shouldShowBestOptionInSortList(subreddit: String? = null): Boolean {
-        return subreddit == null || subreddit.isEmpty() || subreddit.equals("frontpage", ignoreCase = true)
+        return subreddit == null || subreddit.isEmpty() || subreddit.equals(
+            "frontpage",
+            ignoreCase = true
+        )
     }
 
     private fun returnSortTypeListWithoutBestOption(): List<SortType> {

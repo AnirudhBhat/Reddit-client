@@ -102,7 +102,6 @@ class FeedFragment : Fragment() {
         } ?: run {
             if (!configChangeHandled) {
                 feedViewModel.showProgressBar()
-
                 if (SOURCE.equals("profile", true)) {
                     getFeed(SUBREDDIT, after, SortType.saved)
                 } else {
@@ -110,26 +109,6 @@ class FeedFragment : Fragment() {
                 }
             }
         }
-//        feedViewModel.feedViewState.value?.let {
-//            bindUI(it)
-//            bindThisFragmentToSubredditBottomSheet()
-////            if (it.isSubredditBottomSheetOpen) {
-////                openSubredditBottomSheet()
-////            }
-//            if (it.isSortBottomSheetOpen) {
-//                openSortBottomSheet()
-//            }
-//        } ?: run {
-//            if (!configChangeHandled) {
-//                feedViewModel.showProgressBar()
-//
-//                if (SOURCE.equals("profile", true)) {
-//                    getFeed(SUBREDDIT, after, SortType.saved)
-//                } else {
-//                    getFeed(SUBREDDIT, after, SortType.empty)
-//                }
-//            }
-//        }
         return view
     }
 
@@ -224,13 +203,13 @@ class FeedFragment : Fragment() {
                     showErrorToast("Please sign in to use this feature")
                 }
             } else {
+                after = feedViewState?.feedList?.data?.after ?: ""
                 if (!redditList.isNullOrEmpty()) {
                     feedAdapter?.updateRedditData(
                         redditList.toMutableList(),
                         feedViewState.sortType
                     )
                 } else {
-                    after = feedViewState?.feedList?.data?.after ?: ""
                     if (loading) {
                         feedAdapter?.addRedditData(
                             feedViewState.feedList?.data?.children,

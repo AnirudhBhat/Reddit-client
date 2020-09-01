@@ -184,7 +184,6 @@ open class FeedAdapter(
 
     suspend fun isItAGifFromGfycat(redditData: MutableList<Children>?, position: Int): Boolean {
         return withContext(ioScope.coroutineContext) {
-            Log.d("THREADTAG", "isItAGifFromGfycat Running on thread: " + Thread.currentThread())
             val data = redditData?.get(position)?.data
             val type = data?.secureMedia?.type ?: ""
             if (type.contains("gfycat")) {
@@ -418,9 +417,7 @@ open class FeedAdapter(
         ) {
             with(itemView) {
                 mainScope.launch {
-                    Log.d("THREADTAG", "Running on thread: " + Thread.currentThread())
                     supervisorScope {
-                        Log.d("THREADTAG", "scope Running on thread: " + Thread.currentThread())
                         launch {
                             var url: String? = null
                             try {

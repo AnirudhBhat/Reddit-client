@@ -451,7 +451,7 @@ class FeedAdapterTest {
                 false,
                 true,
                 false,
-                "",
+                false,
                 "",
                 "",
                 "",

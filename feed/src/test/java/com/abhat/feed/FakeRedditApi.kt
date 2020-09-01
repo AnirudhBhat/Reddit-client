@@ -6,6 +6,7 @@ import com.abhat.core.SortType.SortType
 import com.abhat.core.model.PostDetailResponse
 import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
+import com.abhat.core.model.TrendingSubreddit
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
@@ -56,6 +57,10 @@ class FakeRedditApi: RedditApi {
         after: String
     ): Deferred<RedditResponse> {
         TODO("Not yet implemented")
+    }
+
+    override fun getTrendingSubreddits(): Deferred<TrendingSubreddit> {
+        return CompletableDeferred(FakeRedditResponse.returnTrendingSubredditResponse())
     }
 
 

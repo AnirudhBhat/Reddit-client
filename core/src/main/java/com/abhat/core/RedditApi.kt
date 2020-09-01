@@ -4,6 +4,7 @@ import com.abhat.core.SortType.SortType
 import com.abhat.core.model.PostDetailResponse
 import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
+import com.abhat.core.model.TrendingSubreddit
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.*
@@ -40,6 +41,9 @@ interface RedditApi {
                           @Path("subreddit") subreddit: String,
                           @Path("sortType") sortType: SortType,
                           @Query("after") after: String = ""): Deferred<RedditResponse>
+
+    @GET("/app/trending_subreddits.json")
+    fun getTrendingSubreddits(): Deferred<TrendingSubreddit>
 
     @GET("user/{user_name}/saved/")
     fun getSavedPosts(@HeaderMap headers: Map<String, String>, @Query("after") after: String = ""): Deferred<RedditResponse>

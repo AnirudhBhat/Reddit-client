@@ -26,6 +26,16 @@ object FakeRedditResponse {
         )
     }
 
+    fun returnTrendingSubredditResponse(): TrendingSubreddit {
+        return TrendingSubreddit(
+            subredditNames = listOf("hostilearchitecture",
+            "netflixbestof",
+            "therewasanattempt",
+            "oldschoolcool",
+            "blunderyears")
+        )
+    }
+
     fun returnRedditResponse(url: String = "", isVideo: Boolean = false,
     subreddit: String = "", sortType: SortType = SortType.hot,
                              replies: RedditResponse? = null): RedditResponse {

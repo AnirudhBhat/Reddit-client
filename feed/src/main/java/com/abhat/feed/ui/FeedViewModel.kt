@@ -109,7 +109,8 @@ open class FeedViewModel(
                             subreddit = subreddit,
                             sortType = returnSortType(sortType, subreddit),
                             sortList = sortTypeList,
-                            error = null
+                            error = null,
+                            after = feedViewResult.feedData?.data?.after ?: ""
                         )
                     }
 

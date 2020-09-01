@@ -103,9 +103,17 @@ class FeedFragment : Fragment() {
             if (!configChangeHandled) {
                 feedViewModel.showProgressBar()
                 if (SOURCE.equals("profile", true)) {
-                    getFeed(SUBREDDIT, after, SortType.saved)
+                    if (::currentFeedUiState.isInitialized) {
+                        getFeed(SUBREDDIT, currentFeedUiState.after, SortType.saved)
+                    } else {
+                        getFeed(SUBREDDIT, "", SortType.saved)
+                    }
                 } else {
-                    getFeed(SUBREDDIT, after, SortType.empty)
+                    if (::currentFeedUiState.isInitialized) {
+                        getFeed(SUBREDDIT, currentFeedUiState.after, SortType.empty)
+                    } else {
+                        getFeed(SUBREDDIT, "", SortType.empty)
+                    }
                 }
             }
         }
@@ -187,7 +195,7 @@ class FeedFragment : Fragment() {
             val headers = HashMap<String, String>()
             headers["Authorization"] =
                 "Bearer " + PreferenceHelper.getTokenFromPrefs(requireActivity())?.access_token
-            feedViewModel.getFeed(headers, SUBREDDIT, after, SortType.empty, true)
+            feedViewModel.getFeed(headers, SUBREDDIT, currentFeedUiState.after, SortType.empty, true)
         })
     }
 
@@ -203,7 +211,7 @@ class FeedFragment : Fragment() {
                     showErrorToast("Please sign in to use this feature")
                 }
             } else {
-                after = feedViewState?.feedList?.data?.after ?: ""
+//                after = feedViewState?.feedList?.data?.after ?: ""
                 if (!redditList.isNullOrEmpty()) {
                     feedAdapter?.updateRedditData(
                         redditList.toMutableList(),
@@ -274,7 +282,7 @@ class FeedFragment : Fragment() {
                             loading = true
                             getFeed(
                                 currentFeedUiState.subreddit,
-                                after,
+                                currentFeedUiState.after,
                                 currentFeedUiState.sortType
                             )
                         }

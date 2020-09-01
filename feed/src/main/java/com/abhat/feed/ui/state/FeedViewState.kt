@@ -16,5 +16,6 @@ data class FeedViewState(
     val error: Throwable? = null,
     val authorizationError: Throwable? = null,
     val isSubredditBottomSheetOpen: Boolean = false,
-    val isSortBottomSheetOpen: Boolean = false
+    val isSortBottomSheetOpen: Boolean = false,
+    val after: String = ""
 )

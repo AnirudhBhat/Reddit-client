@@ -279,7 +279,7 @@ object FakeRedditResponse {
             false,
             true,
             false,
-            "",
+            false,
             "",
             "",
             "",

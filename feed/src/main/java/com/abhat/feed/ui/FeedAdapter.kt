@@ -89,8 +89,8 @@ open class FeedAdapter(
         if (position == 0) {
             (holder as TrendingAndSortViewHolder).bind()
         } else {
-            ioScope.async {
-                val title = redditData?.get(position - 1)?.data?.title ?: ""
+            ioScope.launch {
+                val title = redditData?.get(position - 1)?.data?.title ?: redditData?.get(position - 1)?.data?.bodyHtml ?: ""
                 val author = redditData?.get(position - 1)?.data?.author ?: ""
                 val points = redditData?.get(position - 1)?.data?.score?.toString() ?: ""
                 val comments = redditData?.get(position - 1)?.data?.numComments?.toString() ?: ""
@@ -184,6 +184,7 @@ open class FeedAdapter(
 
     suspend fun isItAGifFromGfycat(redditData: MutableList<Children>?, position: Int): Boolean {
         return withContext(ioScope.coroutineContext) {
+            Log.d("THREADTAG", "isItAGifFromGfycat Running on thread: " + Thread.currentThread())
             val data = redditData?.get(position)?.data
             val type = data?.secureMedia?.type ?: ""
             if (type.contains("gfycat")) {
@@ -417,7 +418,9 @@ open class FeedAdapter(
         ) {
             with(itemView) {
                 mainScope.launch {
+                    Log.d("THREADTAG", "Running on thread: " + Thread.currentThread())
                     supervisorScope {
+                        Log.d("THREADTAG", "scope Running on thread: " + Thread.currentThread())
                         launch {
                             var url: String? = null
                             try {
@@ -522,8 +525,13 @@ open class FeedAdapter(
         ) {
             with(itemView) {
                 titleString?.let {
-                    title.text = titleString
-                    subreddit.text = subredditString
+                    CoroutineScope(CoroutineContextProvider().IO).async {
+                        val redditTitle = Html.fromHtml(Html.fromHtml(titleString).toString()).toString()
+                        withContext(CoroutineContextProvider().Main) {
+                            title.text = redditTitle
+                            subreddit.text = subredditString
+                        }
+                    }
                 } ?: run {
                     CoroutineScope(CoroutineContextProvider().IO).async {
                         val titleHtml =

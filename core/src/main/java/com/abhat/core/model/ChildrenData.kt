@@ -27,7 +27,7 @@ data class ChildrenData(
     @field:Json(name = "downvoted")
     var downvoted:Boolean,
     @field:Json(name = "likes")
-    var likes:String?,
+    var likes:Boolean?,
     @field:Json(name = "subreddit")
     val subreddit:String,
     @field:Json(name = "subreddit_id")

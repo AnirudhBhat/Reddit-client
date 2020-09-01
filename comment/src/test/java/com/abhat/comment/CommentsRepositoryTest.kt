@@ -8,6 +8,7 @@ import com.abhat.core.SortType.SortType
 import com.abhat.core.model.PostDetailResponse
 import com.abhat.core.model.RedditResponse
 import com.abhat.core.model.TokenResponse
+import com.abhat.core.model.TrendingSubreddit
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
@@ -68,6 +69,10 @@ class CommentsRepositoryTest {
             sortType: SortType,
             after: String
         ): Deferred<RedditResponse> {
+            TODO("Not yet implemented")
+        }
+
+        override fun getTrendingSubreddits(): Deferred<TrendingSubreddit> {
             TODO("Not yet implemented")
         }
 

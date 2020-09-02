@@ -16,6 +16,8 @@ data class ChildrenData(
     var indent: Int,
     var shouldUseGlideForGif: Boolean = false,
     var imageUrl: String? = null,
+    @field:Json(name = "display_name")
+    val displayName:String?,
     @field:Json(name="over_18")
     val over18: Boolean? = null,
     @field:Json(name = "crosspost_parent_list")

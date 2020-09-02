@@ -332,7 +332,7 @@ class FeedFragment : Fragment() {
             subredditFragment?.sortType = SortType.hot
             //feedViewModel.subredditBottomSheetOpened()
         } ?: run {
-            subredditFragment = SubredditBottomSheetFragment()
+            subredditFragment = SubredditBottomSheetFragment.newInstance(null)
             subredditFragment?.feedFragment = this
             subredditFragment?.sortType = SortType.hot
             activity?.supportFragmentManager?.let {

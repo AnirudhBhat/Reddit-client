@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.subreddit -> {
                     //replaceFragment()
-                    val subredditBottomSheetFragment = SubredditBottomSheetFragment()
+                    val subredditBottomSheetFragment = SubredditBottomSheetFragment.newInstance(null)
                     val feedFragment = supportFragmentManager.findFragmentByTag("feed_fragment") as? FeedFragment
                     supportFragmentManager?.let {
                         subredditBottomSheetFragment?.show(it, Constants.KEY_SUBREDDIT_BOTTOM_SHEET)

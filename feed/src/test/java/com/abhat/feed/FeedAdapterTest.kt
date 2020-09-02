@@ -438,7 +438,7 @@ class FeedAdapterTest {
 
     private fun prepareAndReturnData(url: String = "",
                                      isVideo: Boolean = false, domain: String = "",
-                                     previewSize: Int = 5, secureMedia: SecureMedia? = null): ChildrenData {
+                                     previewSize: Int = 5, secureMedia: SecureMedia? = null, displaName: String? = null): ChildrenData {
 
         return ChildrenData(false,
                 "",
@@ -446,6 +446,7 @@ class FeedAdapterTest {
             0,
             true,
                 "",
+            displaName,
                 true,
                 listOf(),
                 false,

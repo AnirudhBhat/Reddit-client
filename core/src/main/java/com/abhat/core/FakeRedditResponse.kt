@@ -47,7 +47,8 @@ object FakeRedditResponse {
                     Children(
                         prepareAndReturnData(
                             url = url,
-                            replies = replies
+                            replies = replies,
+                            displayName = "androiddev"
                         ),
                         "",
                         1,
@@ -57,7 +58,8 @@ object FakeRedditResponse {
                     Children(
                         prepareAndReturnData(
                             url = url,
-                            replies = null
+                            replies = null,
+                            displayName = "askreddit"
                         ),
                         "",
                         1,
@@ -67,7 +69,8 @@ object FakeRedditResponse {
                     Children(
                         prepareAndReturnData(
                             url = url,
-                            replies = null
+                            replies = null,
+                            displayName = "kannada"
                         ),
                         "",
                         1,
@@ -77,7 +80,8 @@ object FakeRedditResponse {
                     Children(
                         prepareAndReturnData(
                             url = url,
-                            replies = null
+                            replies = null,
+                            displayName = "pics"
                         ),
                         "",
                         1,
@@ -87,7 +91,8 @@ object FakeRedditResponse {
                     Children(
                         prepareAndReturnData(
                             url = url,
-                            replies = null
+                            replies = null,
+                            displayName = "programming"
                         ),
                         "",
                         1,
@@ -276,7 +281,7 @@ object FakeRedditResponse {
     private fun prepareAndReturnData(url: String = "",
                                      isVideo: Boolean = false, domain: String = "",
                                      previewSize: Int = 5,
-                                     replies: RedditResponse? = null): ChildrenData {
+                                     replies: RedditResponse? = null, displayName: String? = null): ChildrenData {
 
         return ChildrenData(false,
             "",
@@ -284,6 +289,7 @@ object FakeRedditResponse {
             0,
             false,
             "",
+            displayName,
             true,
             listOf(),
             false,

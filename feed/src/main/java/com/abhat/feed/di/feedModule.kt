@@ -2,10 +2,9 @@ package com.abhat.feed.di
 
 import com.abhat.core.RedditApi
 import com.abhat.core.common.CoroutineContextProvider
-import com.abhat.feed.data.FeedRepositoryImpl
-import com.abhat.feed.data.TrendingSubredditRepository
-import com.abhat.feed.data.TrendingSubredditRepositoryImpl
+import com.abhat.feed.data.*
 import com.abhat.feed.ui.FeedViewModel
+import com.abhat.feed.ui.subreddit.SubredditViewModel
 import com.abhat.feed.ui.trendingsubreddit.TrendingSubredditViewModel
 import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
@@ -16,8 +15,10 @@ import org.koin.dsl.module.module
 val feedModule = module {
     viewModel { provideFeedViewModel(get(), get()) }
     viewModel { provideTrendingSubredditViewModel(get(), get()) }
+    viewModel { provideSubredditViewModel(get(), get()) }
     factory { provideFeedRepository(get()) }
     factory { provideTrendingSubredditRepository(get()) }
+    factory { provideSubredditRepository(get()) }
 }
 
 private fun provideFeedViewModel(feedRepository: FeedRepositoryImpl,
@@ -29,3 +30,7 @@ private fun provideTrendingSubredditViewModel(trendingSubredditRepository: Trend
                                               contextProvider: CoroutineContextProvider) = TrendingSubredditViewModel(trendingSubredditRepository, contextProvider)
 
 private fun provideTrendingSubredditRepository(redditApi: RedditApi) = TrendingSubredditRepositoryImpl(redditApi)
+
+private fun provideSubredditViewModel(subredditRepository: SubredditRepositoryImpl, coroutineContextProvider: CoroutineContextProvider) = SubredditViewModel(subredditRepository, coroutineContextProvider)
+
+private fun provideSubredditRepository(redditApi: RedditApi) = SubredditRepositoryImpl(redditApi)

@@ -76,6 +76,13 @@ class CommentsRepositoryTest {
             TODO("Not yet implemented")
         }
 
+        override fun getSubscribedSubreddits(
+            headers: Map<String, String>,
+            limit: Int
+        ): Deferred<RedditResponse> {
+            return CompletableDeferred(FakeRedditResponse.returnRedditResponse())
+        }
+
         override fun getRedditFrontPage(
             @Path("sortType") sortType: String,
             after: String

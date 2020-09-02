@@ -63,6 +63,13 @@ class FakeRedditApi: RedditApi {
         return CompletableDeferred(FakeRedditResponse.returnTrendingSubredditResponse())
     }
 
+    override fun getSubscribedSubreddits(
+        headers: Map<String, String>,
+        limit: Int
+    ): Deferred<RedditResponse> {
+        return CompletableDeferred(FakeRedditResponse.returnRedditResponse())
+    }
+
 
     override fun getAccessToken(
         headers: Map<String, String>,

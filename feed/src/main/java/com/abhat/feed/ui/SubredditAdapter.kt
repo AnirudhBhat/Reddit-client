@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.item_subreddit_bottom_sheet.view.*
  * Created by Anirudh Uppunda on 06,July,2020
  */
 class SubredditAdapter(
-    private val subredditList: List<String>,
+    private var subredditList: List<String>?,
     private val feedFragment: FeedFragment?,
     private val sortType: SortType?,
     private val subredditBottomSheetFragment: SubredditBottomSheetFragment
@@ -22,6 +22,11 @@ class SubredditAdapter(
 
     private var after: String = ""
 
+    fun updateSubredditList(subredditList: List<String>?) {
+        this.subredditList = subredditList
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubredditViewHolder {
         return SubredditViewHolder(
             LayoutInflater.from(parent.context)
@@ -29,7 +34,7 @@ class SubredditAdapter(
         )
     }
 
-    override fun getItemCount() = subredditList.size
+    override fun getItemCount() = subredditList?.size ?: 0
 
     override fun onBindViewHolder(holder: SubredditViewHolder, position: Int) {
         holder.bind()
@@ -48,7 +53,7 @@ class SubredditAdapter(
         }
         fun bind() {
             with(itemView) {
-                tv_subreddit.text = subredditList[adapterPosition]
+                tv_subreddit.text = subredditList?.get(adapterPosition) ?: ""
             }
         }
     }

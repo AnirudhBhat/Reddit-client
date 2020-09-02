@@ -42,7 +42,7 @@ interface RedditApi {
                           @Path("sortType") sortType: SortType,
                           @Query("after") after: String = ""): Deferred<RedditResponse>
 
-    @GET("/app/trending_subreddits.json")
+    @GET("/api/trending_subreddits/.json")
     fun getTrendingSubreddits(): Deferred<TrendingSubreddit>
 
     @GET("user/{user_name}/saved/")
@@ -73,12 +73,12 @@ interface RedditApi {
              @FieldMap fields: Map<String, String>): Deferred<Response<Void>>
     
 
-    @GET("user/kernel_pan1c/upvoted/")
+    @GET("user/{user_name}/upvoted/")
     fun getUpvotedPosts(@HeaderMap headers: Map<String, String>): Deferred<PostDetailResponse>
 
-    @GET("user/kernel_pan1c/downvoted/")
+    @GET("user/{user_name}/downvoted/")
     fun getDownvotedPosts(@HeaderMap headers: Map<String, String>): Deferred<PostDetailResponse>
 
-    @GET("user/kernel_pan1c/overview/")
+    @GET("user/{user_name}/overview/")
     fun getOverviewPosts(@HeaderMap headers: Map<String, String>): Deferred<PostDetailResponse>
 }

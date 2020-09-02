@@ -20,6 +20,10 @@ class TrendingAndSortViewHolder(
                 fragment?.openSortBottomSheet()
             }
 
+            trending.setOnClickListener {
+                fragment?.openTrendingSubredditBottomSheet()
+            }
+
 //            fragment?.getSortTypeLiveData()?.observe(fragment, Observer {
 //                sort.text = it.name.capitalize()
 //            })

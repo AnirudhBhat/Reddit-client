@@ -93,7 +93,7 @@ open class FeedViewModel(
                 }
                 when (feedViewResult) {
                     is FeedViewResult.LoadingState -> {
-                        currentViewState.copy(
+                        currentViewState = currentViewState.copy(
                             isLoading = true,
                             subreddit = subreddit,
                             sortType = returnSortType(sortType, subreddit),

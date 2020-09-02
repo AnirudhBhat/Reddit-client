@@ -20,7 +20,9 @@ import com.abhat.core.model.*
 import com.abhat.feed.R
 import com.abhat.feed.ui.constants.Constants
 import com.abhat.feed.ui.constants.Constants.KEY_SUBREDDIT_BOTTOM_SHEET
+import com.abhat.feed.ui.constants.Constants.KEY_TRENDING_SUBREDDIT_BOTTOM_SHEET
 import com.abhat.feed.ui.state.FeedViewState
+import com.abhat.feed.ui.trendingsubreddit.TrendingSubredditBottomSheetFragment
 import kotlinx.android.synthetic.main.fragment_feed.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -336,12 +338,13 @@ class FeedFragment : Fragment() {
             activity?.supportFragmentManager?.let {
                 subredditFragment?.show(it, KEY_SUBREDDIT_BOTTOM_SHEET)
             }
-            //feedViewModel.subredditBottomSheetOpened()
         }
-//        Handler().postDelayed({
-//            subredditFragment?.dialog?.setOnCancelListener {
-//                feedViewModel.subredditBottomSheetClosed()
-//            }
-//        }, 200)
+    }
+
+    fun openTrendingSubredditBottomSheet() {
+        val trendingSubredditBottomSheet = TrendingSubredditBottomSheetFragment.newInstance(null)
+        activity?.supportFragmentManager?.let {
+            trendingSubredditBottomSheet?.show(it, KEY_TRENDING_SUBREDDIT_BOTTOM_SHEET)
+        }
     }
 }

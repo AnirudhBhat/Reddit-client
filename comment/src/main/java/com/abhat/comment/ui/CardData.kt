@@ -9,5 +9,6 @@ data class CardData(
     val subreddit: String,
     val timeHoursAgo: String,
     val points: String,
-    val comments: String
+    val comments: String,
+    val description: String?
 )

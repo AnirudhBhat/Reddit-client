@@ -12,7 +12,6 @@ import com.abhat.feed.R
 import com.abhat.feed.ui.FeedFragment
 import com.abhat.feed.ui.constants.Constants
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_subreddit_bottomsheet_layout.*
 import kotlinx.android.synthetic.main.fragment_trending_subreddit_bottomsheet_layout.*
 import org.koin.android.viewmodel.ext.android.viewModel
 

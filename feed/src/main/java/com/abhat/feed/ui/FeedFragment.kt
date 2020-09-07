@@ -216,19 +216,19 @@ class FeedFragment : Fragment() {
 //                after = feedViewState?.feedList?.data?.after ?: ""
                 if (!redditList.isNullOrEmpty()) {
                     feedAdapter?.updateRedditData(
-                        redditList.toMutableList(),
-                        feedViewState.sortType
+                        redditData = redditList.toMutableList(),
+                        sortType = feedViewState.sortType
                     )
                 } else {
                     if (loading) {
                         feedAdapter?.addRedditData(
-                            feedViewState.feedList?.data?.children,
-                            feedViewState.sortType
+                            redditData = feedViewState.feedList?.data?.children,
+                            sortType = feedViewState.sortType
                         )
                     } else {
                         feedAdapter?.updateRedditData(
-                            feedViewState.feedList?.data?.children,
-                            feedViewState.sortType
+                            redditData = feedViewState.feedList?.data?.children,
+                            sortType = feedViewState.sortType
                         )
 //                    feedRecyclerView?.scheduleLayoutAnimation()
                     }

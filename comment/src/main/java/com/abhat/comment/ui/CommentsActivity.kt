@@ -22,6 +22,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
  * Created by Anirudh Uppunda on 03,June,2020
  */
 class CommentsActivity: AppCompatActivity() {
+    private lateinit var parentComments: List<Children>
     private val commentsViewModel: CommentsViewModel by viewModel()
     private var commentsAdapter: CommentsAdapter? = null
     private val list = mutableListOf<Children>()
@@ -40,6 +41,7 @@ class CommentsActivity: AppCompatActivity() {
         val comments = intent.getStringExtra("comments")
         val articleUrl = intent.getStringExtra("articleUrl")
         val imageUrl = intent.getStringExtra("imageUrl")
+        val description = intent.getStringExtra("description")
         val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
             override fun getVerticalSnapPreference(): Int {
                 return SNAP_TO_START
@@ -57,7 +59,8 @@ class CommentsActivity: AppCompatActivity() {
                 subreddit,
                 timeHoursAgo,
                 points,
-                comments
+                comments,
+                description
         ), imageUrl)
         observeViewModel()
         commentsViewModel.getUIState().value?.let {
@@ -99,6 +102,7 @@ class CommentsActivity: AppCompatActivity() {
             pb_comments_activity.visibility = View.GONE
             fab_next_parent_comment?.visibility = View.VISIBLE
             printRedditComments(children)
+//            parentComments = list.filter { it.isParentComment }
             commentsAdapter?.updateCommentsList(list)
             commentsAdapter?.notifyItemChanged(1)
 //                rv_comments?.scheduleLayoutAnimation()

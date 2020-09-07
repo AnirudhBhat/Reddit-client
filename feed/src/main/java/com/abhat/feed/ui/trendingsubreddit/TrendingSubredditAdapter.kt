@@ -36,6 +36,11 @@ class TrendingSubredditAdapter(private var trendingSubredditsList: List<String>?
         fun bind() {
             with (itemView) {
                 tv_trending_subreddit.text = trendingSubredditsList?.get(position) ?: ""
+                tv_trending_subreddit.setOnClickListener {
+                    feedFragment?.showProgressBar()
+                    val subreddit = tv_trending_subreddit.text.toString()
+                    feedFragment?.getFeed(subreddit, "", SortType.hot)
+                }
             }
         }
     }

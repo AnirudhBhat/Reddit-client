@@ -395,6 +395,7 @@ open class FeedAdapter(
                     intent.putExtra("points", points.text)
                     intent.putExtra("comments", comments.text)
                     intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
+                    intent.putExtra("description", redditData?.get(position - 1)?.data?.selfTextHtml)
                     intent.putExtra("articleUrl",
                         redditData?.get(position - 1)?.data?.id
                     )

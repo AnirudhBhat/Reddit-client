@@ -1,5 +1,6 @@
 package com.abhat.comment.ui
 
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +62,13 @@ class CommentsAdapter(val cardData: CardData,
                     iv_image.load(imageUrl)
                 } ?: run {
                     iv_image.visibility = View.GONE
+                }
+                if (cardData.description.isNullOrEmpty().not()) {
+                    description.visibility = View.VISIBLE
+                    description.text = Html.fromHtml(Html.fromHtml(cardData.description).toString())
+                    description.maxLines = Int.MAX_VALUE
+                } else {
+                    description.visibility = View.GONE
                 }
             }
         }

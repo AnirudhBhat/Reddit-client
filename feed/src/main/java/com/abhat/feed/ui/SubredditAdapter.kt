@@ -23,7 +23,9 @@ class SubredditAdapter(
     private var after: String = ""
 
     fun updateSubredditList(subredditList: List<String>?) {
-        this.subredditList = subredditList
+        this.subredditList = subredditList?.sortedBy {
+            it.toLowerCase()
+        }
         notifyDataSetChanged()
     }
 

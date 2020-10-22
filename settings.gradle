@@ -1,4 +1,4 @@
-include ':app', ':core', ':oauth', ':feed'
+include ':app', ':core', ':oauth', ':feed', ':search'
 rootProject.name='Reddit'
 include ':comment'
 include ':navigation'

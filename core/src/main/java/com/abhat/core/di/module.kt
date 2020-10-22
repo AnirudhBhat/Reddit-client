@@ -49,7 +49,6 @@ private fun provideOkHttpClient(interceptor: HostSelectionInterceptor): OkHttpCl
     return OkHttpClient.Builder()
         .addInterceptor(logging)
         .addInterceptor(interceptor)
-        .hostnameVerifier { hostname, session -> true }
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()

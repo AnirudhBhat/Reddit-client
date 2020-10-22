@@ -7,6 +7,11 @@
         android:title="Front page"
         app:showAsAction="always" />
     <item
+        android:id="@+id/search"
+        android:enabled="true"
+        android:title="Search"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/subreddit"
         android:enabled="true"
         android:title="Subreddits"

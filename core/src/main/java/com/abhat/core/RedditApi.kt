@@ -51,6 +51,9 @@ interface RedditApi {
     @GET("user/{user_name}/saved/")
     fun getSavedPosts(@HeaderMap headers: Map<String, String>, @Query("after") after: String = ""): Deferred<RedditResponse>
 
+    @GET("subreddits/search.json")
+    fun search(@Query("q") q: String, @Query("include_over_18") includeOver18: String = "on"): Deferred<RedditResponse>
+
 //    @GET("hot.json?")
 //    fun getRedditFrontPage(@HeaderMap headers: Map<String, String>,
 //                          @Query("after") after: String = ""): Deferred<PostDetailResponse>

@@ -66,5 +66,10 @@ dependencies {
     api project(path: ':oauth')
     api project(path: ':comment')
     api project(path: ':feed')
+    api project(path: ':search')
     implementation("io.coil-kt:coil:0.10.1")
+
+    implementation 'androidx.ui:ui-layout:0.1.0-dev02'
+    implementation 'androidx.ui:ui-material:0.1.0-dev02'
+    implementation 'androidx.ui:ui-tooling:0.1.0-dev02'
 }

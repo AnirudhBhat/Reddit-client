@@ -1,12 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
-def keyPropertiesFile = rootProject.file("key.properties")
-def keyProperties = new Properties()
-keyProperties.load(new FileInputStream(keyPropertiesFile))
-
-
+apply plugin: "kotlin-kapt"
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -20,8 +15,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
-
-        buildConfigField("String", "CLIENT_ID", keyProperties['CLIENT_ID'])// keyProperties['CLIENT_ID']     "\"client_id\""
     }
 
     buildTypes {
@@ -36,21 +29,28 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation lib.kotlin.kotlin_stdlib
+    implementation project(path: ':core')
+    implementation lib.threetenabp
+    implementation lib.lifecycleviewmodelktx
     implementation lib.appcompat
-    implementation lib.material
-    implementation lib.moshiconverter
+    implementation lib.corektx
+    implementation lib.constraintlayout
     implementation lib.coroutinesandroid
     implementation lib.coroutinesadapter
+    implementation lib.okhttp
+    implementation lib.retrofit
     implementation lib.retrofitgsonconverter
+    implementation lib.retrofitlogging
+    implementation lib.glide
+    kapt lib.glidecompiler
+    implementation lib.exoplayer
     implementation lib.koinandroid
     implementation lib.koinviewmodel
-    implementation lib.retrofitlogging
-    implementation lib.threetenabp
-    api lib.swiperefreshlayout
-    api lib.recyclerview
-    api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    testImplementation lib.junit
+    implementation lib.material
+    testImplementation lib.coretesting
+    testImplementation lib.mockitokotlin
+    androidTestImplementation lib.junit
     androidTestImplementation lib.junitext
     androidTestImplementation lib.espressocore
-    api("io.coil-kt:coil:0.10.1")
+    api "androidx.fragment:fragment-ktx:1.2.4"
 }

@@ -33,46 +33,59 @@ class CommentsActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comments)
-        val title = intent.getStringExtra("title")
-        val author = intent.getStringExtra("author")
-        val subreddit = intent.getStringExtra("subreddit")
-        val timeHoursAgo = intent.getStringExtra("hoursAgo")
-        val points = intent.getStringExtra("points")
-        val comments = intent.getStringExtra("comments")
-        val articleUrl = intent.getStringExtra("articleUrl")
-        val imageUrl = intent.getStringExtra("imageUrl")
-        val description = intent.getStringExtra("description")
-        val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
-            }
-        }
-        fab_next_parent_comment.setOnClickListener {
-            previousParentCommentPosition = commentsViewModel.getNextParentCommentPosition(previousParentCommentPosition + 1, list) ?: 0
-            smoothScroller.targetPosition = previousParentCommentPosition
-            (rv_comments.layoutManager as LinearLayoutManager).startSmoothScroll(smoothScroller)
-        }
-        setupRecyclerView(
-            CardData(
-                title,
-                author,
-                subreddit,
-                timeHoursAgo,
-                points,
-                comments,
-                description
-        ), imageUrl)
-        observeViewModel()
-        commentsViewModel.getUIState().value?.let {
-            bindUI(it)
+        intent.data?.let {
+            handleDeeplink()
         } ?: run {
-            commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
+            val title = intent.getStringExtra("title")
+            val author = intent.getStringExtra("author")
+            val subreddit = intent.getStringExtra("subreddit")
+            val timeHoursAgo = intent.getStringExtra("hoursAgo")
+            val points = intent.getStringExtra("points")
+            val comments = intent.getStringExtra("comments")
+            val articleUrl = intent.getStringExtra("articleUrl")
+            val url = intent.getStringExtra("url")
+            val imageUrl = intent.getStringExtra("imageUrl")
+            val description = intent.getStringExtra("description")
+            val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
+                override fun getVerticalSnapPreference(): Int {
+                    return SNAP_TO_START
+                }
+            }
+            fab_next_parent_comment.setOnClickListener {
+                previousParentCommentPosition = commentsViewModel.getNextParentCommentPosition(previousParentCommentPosition + 1, list) ?: 0
+                smoothScroller.targetPosition = previousParentCommentPosition
+                (rv_comments.layoutManager as LinearLayoutManager).startSmoothScroll(smoothScroller)
+            }
+            setupRecyclerView(
+                CardData(
+                    title,
+                    author,
+                    subreddit,
+                    timeHoursAgo,
+                    points,
+                    comments,
+                    description
+                ), imageUrl, url)
+            observeViewModel()
+            commentsViewModel.getUIState().value?.let {
+                bindUI(it)
+            } ?: run {
+                commentsViewModel.onAction(Action.LoadPostDetails(subreddit, articleUrl))
+            }
         }
     }
 
-    private fun setupRecyclerView(cardData: CardData, imageUrl: String?) {
+    private fun handleDeeplink() {
+        val data = intent.data
+        data?.let {
+            observeViewModel()
+            commentsViewModel.onAction(Action.LoadPostDetails(data.pathSegments[1], data.pathSegments[3] + "/" + data.pathSegments[4] + "/" + data.pathSegments[5]))
+        }
+    }
+
+    private fun setupRecyclerView(cardData: CardData, imageUrl: String?, articleUrl: String?) {
         rv_comments.layoutManager = LinearLayoutManager(this)
-        commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl)
+        commentsAdapter = CommentsAdapter(cardData, listOf(), imageUrl, articleUrl)
         rv_comments.adapter = commentsAdapter
         commentsAdapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         rv_comments.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -99,6 +112,18 @@ class CommentsActivity: AppCompatActivity() {
 
         }
         uiState.success?.data?.children?.let { children ->
+            if (rv_comments.adapter == null) {
+                setupRecyclerView(
+                    CardData(
+                    title = "",
+                    author = "",
+                        subreddit = "",
+                        points = "",
+                        timeHoursAgo = "",
+                        comments = "",
+                        description = ""
+                ), null, null)
+            }
             pb_comments_activity.visibility = View.GONE
             fab_next_parent_comment?.visibility = View.VISIBLE
             printRedditComments(children)

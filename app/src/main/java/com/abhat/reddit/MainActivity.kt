@@ -1,5 +1,8 @@
 package com.abhat.reddit
 
+import android.R.attr
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +13,7 @@ import com.abhat.feed.ui.SubredditBottomSheetFragment
 import com.abhat.feed.ui.constants.Constants
 import com.abhat.oauth.ui.OauthFragment
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +45,13 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.front_page -> {
                     replaceFragment(FeedFragment.newInstance(), "feed_fragment")
+                    true
+                }
+
+                R.id.search -> {
+                    val intent = Intent()
+                    intent.setClassName(this, "com.abhat.search.ui.SearchActivity")
+                    startActivityForResult(intent, 9999)
                     true
                 }
 
@@ -84,5 +95,17 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.container, fragment, tag)
             .commitAllowingStateLoss()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode === 9999) {
+            if (resultCode === Activity.RESULT_OK) {
+                replaceFragment(FeedFragment.newInstance(subreddit = data?.getStringExtra("subreddit") ?: "frontpage"), "feed_fragment")
+            }
+            if (resultCode === Activity.RESULT_CANCELED) {
+
+            }
+        }
     }
 }

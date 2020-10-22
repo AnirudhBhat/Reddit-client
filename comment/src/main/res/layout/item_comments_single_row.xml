@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/cv_comment"
+    android:background="@android:color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -115,7 +116,8 @@
         android:paddingBottom="24dp"
         android:paddingEnd="24dp"
         android:textIsSelectable="true"
-        tools:text="This is a sample comment"
+        android:lineSpacingExtra="5dp"
+        tools:text="This is a sample comment asd asd asd asd asd asd asd asd asd asd asd sad asd asd "
         android:textColor="@color/title_color" />
 
     <TextView

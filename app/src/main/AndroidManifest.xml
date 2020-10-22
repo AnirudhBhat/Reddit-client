@@ -21,7 +21,29 @@
         </activity>
         <activity android:name="com.abhat.oauth.ui.OauthActivity"/>
         <activity android:name="com.abhat.feed.ui.MediaActivity"/>
-        <activity android:name="com.abhat.comment.ui.CommentsActivity"/>
+        <activity android:name="com.abhat.comment.ui.CommentsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="reddit.com"
+                    android:pathPrefix="/r/"
+                    android:pathPattern="/*/comments/*"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/r/"
+                    android:pathPattern="/*/comments/*"/>
+            </intent-filter>
+
+        </activity>
+        <activity android:name="com.abhat.search.ui.SearchActivity"/>
     </application>
 
 </manifest>

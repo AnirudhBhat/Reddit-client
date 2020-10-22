@@ -1,5 +1,7 @@
 package com.abhat.comment.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +17,8 @@ import kotlinx.android.synthetic.main.item_card.view.*
  */
 class CommentsAdapter(val cardData: CardData,
                       private var commentsList: List<Children>,
-                      private val imageUrl: String?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                      private val imageUrl: String?,
+                      private val articleUrl: String?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
@@ -69,6 +72,11 @@ class CommentsAdapter(val cardData: CardData,
                     description.maxLines = Int.MAX_VALUE
                 } else {
                     description.visibility = View.GONE
+                }
+                redditLayout.setOnClickListener {
+                    if (cardData.subreddit.equals("bestof", true) && articleUrl != null) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl)))
+                    }
                 }
             }
         }

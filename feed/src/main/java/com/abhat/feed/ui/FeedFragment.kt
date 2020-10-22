@@ -99,8 +99,10 @@ class FeedFragment : Fragment() {
         savedInstanceState?.let {
             configChangeHandled = true
             val state = feedViewModel.feedViewState.value
-            val redditList = it.getParcelableArrayList<Children>("redditList") as List<Children>
-            bindUI(state!!, redditList)
+            val redditList = it.getParcelableArrayList<Children>("redditList") as? List<Children>
+            state?.let {
+                bindUI(it, redditList)
+            }
         } ?: run {
             if (!configChangeHandled) {
                 feedViewModel.showProgressBar()
@@ -114,7 +116,7 @@ class FeedFragment : Fragment() {
                     if (::currentFeedUiState.isInitialized) {
                         getFeed(SUBREDDIT, currentFeedUiState.after, SortType.empty)
                     } else {
-                        getFeed(SUBREDDIT, "", SortType.empty)
+                        getFeed(SUBREDDIT, "", SortType.hot)
                     }
                 }
             }
@@ -208,7 +210,7 @@ class FeedFragment : Fragment() {
             if (anyError(feedViewState)) {
                 loading = false
                 if (isNetworkError(feedViewState)) {
-                    showErrorToast("oops, something went wrong!, please check your connection")
+                    showErrorToast(feedViewState.error?.message ?: "oops, something went wrong!, please check your connection")
                 } else if (isAuthorizationError(feedViewState)) {
                     showErrorToast("Please sign in to use this feature")
                 }

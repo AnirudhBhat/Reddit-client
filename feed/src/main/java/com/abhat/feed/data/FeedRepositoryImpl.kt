@@ -61,8 +61,8 @@ open class FeedRepositoryImpl(val redditApi: RedditApi): FeedRepository, KoinCom
         after: String,
         sortType: SortType
     ): FeedViewResult? {
-        hostSelectionInterceptor.host = "www.oauth.reddit.com"
         try {
+            hostSelectionInterceptor.host = "oauth.reddit.com"
             val response: RedditResponse = if ( subreddit.isNullOrEmpty() || subreddit.equals("frontpage", ignoreCase = true)) {
                 when (sortType) {
                     SortType.empty -> {

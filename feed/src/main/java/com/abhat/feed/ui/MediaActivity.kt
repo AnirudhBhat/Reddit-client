@@ -61,6 +61,7 @@ class MediaActivity : AppCompatActivity(), Player.EventListener {
         var url = intent.getStringExtra("url")
         var imageUrl = intent.getStringExtra("imageUrl")
         var shouldUseGlide = intent.getBooleanExtra("shoulduseglide", false)
+        var over18 = intent.getBooleanExtra("over_18", false)
 
         setupClickListeners()
 

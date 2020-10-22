@@ -5,6 +5,7 @@ import com.abhat.comment.data.CommentsRepositoryImpl
 import com.abhat.comment.ui.CommentsViewModel
 import com.abhat.core.RedditApi
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.network.HostSelectionInterceptor
 import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
@@ -14,9 +15,9 @@ import org.koin.dsl.module.module
 
 val postDetailModule = module {
     viewModel { providePostDetailViewModel(get(), get()) }
-    factory { providePostDetailRepository(get()) }
+    factory { providePostDetailRepository(get(), get()) }
 }
 
 private fun providePostDetailViewModel(commentsRepository: CommentsRepositoryImpl, contextProvider: CoroutineContextProvider) = CommentsViewModel(commentsRepository, contextProvider)
 
-private fun providePostDetailRepository(commentsApi: RedditApi) = CommentsRepositoryImpl(commentsApi)
+private fun providePostDetailRepository(commentsApi: RedditApi, interceptor: HostSelectionInterceptor) = CommentsRepositoryImpl(commentsApi, interceptor)

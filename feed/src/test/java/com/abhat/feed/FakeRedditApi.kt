@@ -103,6 +103,10 @@ class FakeRedditApi: RedditApi {
         TODO("Not yet implemented")
     }
 
+    override fun search(q: String, includeOver18: String): Deferred<RedditResponse> {
+        TODO("Not yet implemented")
+    }
+
     override fun getUpvotedPosts(headers: Map<String, String>): Deferred<PostDetailResponse> {
         TODO("Not yet implemented")
     }

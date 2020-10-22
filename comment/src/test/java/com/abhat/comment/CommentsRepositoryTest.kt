@@ -29,7 +29,7 @@ class CommentsRepositoryTest {
     @Before
     fun setup() {
         commentsApi = FakeCommentsApi()
-        commentsRepository = CommentsRepositoryImpl(commentsApi)
+        commentsRepository = CommentsRepositoryImpl(commentsApi, null)
     }
 
     @Test

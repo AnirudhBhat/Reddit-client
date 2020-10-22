@@ -376,6 +376,7 @@ open class FeedAdapter(
                         intent.putExtra("imageUrl", redditData?.get(position - 1)?.data?.imageUrl)
                         intent.putExtra("gif_url", redditData?.get(position - 1)?.data?.gifLink)
                         intent.putExtra("url", redditData?.get(position - 1)?.data?.url)
+                        intent.putExtra("over_18", redditData?.get(position - 1)?.data?.over18)
                         intent.putExtra(
                             "shoulduseglide",
                             redditData?.get(position - 1)?.data?.shouldUseGlideForGif
@@ -398,6 +399,9 @@ open class FeedAdapter(
                     intent.putExtra("description", redditData?.get(position - 1)?.data?.selfTextHtml)
                     intent.putExtra("articleUrl",
                         redditData?.get(position - 1)?.data?.id
+                    )
+                    intent.putExtra("url",
+                        redditData?.get(position - 1)?.data?.url
                     )
                     context.startActivity(intent)
                 }

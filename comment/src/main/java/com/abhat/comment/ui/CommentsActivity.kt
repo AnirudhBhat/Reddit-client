@@ -109,7 +109,7 @@ class CommentsActivity: AppCompatActivity() {
         if (uiState.isLoading) {
             pb_comments_activity.visibility = View.VISIBLE
         } else {
-
+            pb_comments_activity.visibility = View.GONE
         }
         uiState.success?.data?.children?.let { children ->
             if (rv_comments.adapter == null) {

@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
  * Created by Anirudh Uppunda on 24,September,2020
  */
 open class SearchViewModel(
-    private val searchRepository: SearchRepositoryImpl,
+    private val searchRepository: SearchRepository,
     private val contextProvider: CoroutineContextProvider
 ): ViewModel() {
 
@@ -35,12 +35,16 @@ open class SearchViewModel(
         reducer(SearchViewState.Loading(true))
         viewModelScope.launch(contextProvider.Main) {
             supervisorScope {
-                val response =
-                    withContext(viewModelScope.coroutineContext + contextProvider.IO) {
-                        searchRepository.search(searchQuery)
+                try {
+                    val response =
+                        withContext(viewModelScope.coroutineContext + contextProvider.IO) {
+                            searchRepository.search(searchQuery)
+                        }
+                    response?.let { response ->
+                        reducer(stateToResult(response))
                     }
-                response?.let { response ->
-                    reducer(stateToResult(response))
+                } catch (e: Exception) {
+                    reducer(SearchViewState.Failure(throwable = e.cause))
                 }
             }
         }
@@ -53,7 +57,7 @@ open class SearchViewModel(
             }
 
             is SearchResult.Success -> {
-                SearchViewState.Success(searchResult.response)
+                SearchViewState.Success(mapRedditResponseToDisplayNames(searchResult.response))
             }
 
             is SearchResult.Error -> {
@@ -77,7 +81,7 @@ open class SearchViewModel(
             }
 
             is SearchViewState.Success -> {
-                currentUIState.copy(isLoading = false, success = mapRedditResponseToDisplayNames(searchViewState.response) ?: listOf())
+                currentUIState.copy(isLoading = false, success = searchViewState.response ?: listOf())
             }
 
             is SearchViewState.Failure -> {

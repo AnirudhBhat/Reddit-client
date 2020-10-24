@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.abhat.core.common.CoroutineContextProvider
 import com.abhat.core.model.RedditResponse
 import com.abhat.search.data.SearchRepository
-import com.abhat.search.data.SearchRepositoryImpl
 import com.abhat.search.data.SearchResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -35,17 +34,17 @@ open class SearchViewModel(
         reducer(SearchViewState.Loading(true))
         viewModelScope.launch(contextProvider.Main) {
             supervisorScope {
-                try {
+//                try {
                     val response =
-                        withContext(viewModelScope.coroutineContext + contextProvider.IO) {
+                        withContext(this.coroutineContext + contextProvider.IO) {
                             searchRepository.search(searchQuery)
                         }
                     response?.let { response ->
                         reducer(stateToResult(response))
                     }
-                } catch (e: Exception) {
-                    reducer(SearchViewState.Failure(throwable = e.cause))
-                }
+//                } catch (e: Exception) {
+//                    reducer(SearchViewState.Failure(throwable = e.cause))
+//                }
             }
         }
     }
@@ -57,7 +56,7 @@ open class SearchViewModel(
             }
 
             is SearchResult.Success -> {
-                SearchViewState.Success(mapRedditResponseToDisplayNames(searchResult.response))
+                SearchViewState.Success(mapRedditResponseToSearchUIModelResponse(searchResult.response))
             }
 
             is SearchResult.Error -> {
@@ -90,10 +89,17 @@ open class SearchViewModel(
         }
     }
 
-    private fun mapRedditResponseToDisplayNames(redditResponse: RedditResponse?): List<String>? {
-        return redditResponse?.data?.children?.map { children ->
-            children.data.displayName ?: ""
+    private fun mapRedditResponseToSearchUIModelResponse(redditResponse: RedditResponse?): List<SearchedSubreddits>? {
+        val subreddits = mutableListOf<SearchedSubreddits>()
+        redditResponse?.data?.children?.map { children ->
+            subreddits.add(SearchedSubreddits(name = children.data.displayName ?: "", icon = children.data.icon))
         }
+        return subreddits
     }
+
+    data class SearchedSubreddits(
+        val name: String,
+        val icon: String?
+    )
 
 }

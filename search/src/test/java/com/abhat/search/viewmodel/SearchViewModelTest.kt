@@ -48,11 +48,11 @@ class SearchViewModelTest {
             searchViewModel = SearchViewModel(searchRepository, TestContextProvider())
             searchViewModel.getUIState().observeForever(searchObserver)
             val loadingTrueState = UIState(isLoading = true, success = null, error = null)
-            val successState = UIState(isLoading = false, success = listOf("androiddev",
-                                                                            "askreddit",
-                                                                            "kannada",
-                                                                            "pics",
-                                                                            "programming"), error = null)
+            val successState = UIState(isLoading = false, success = listOf(SearchViewModel.SearchedSubreddits(name = "androiddev", icon = "https://www.google.com"),
+                                                                           SearchViewModel.SearchedSubreddits( name = "askreddit", icon = "https://www.google.com"),
+                                                                            SearchViewModel.SearchedSubreddits(name = "kannada", icon = "https://www.google.com"),
+                                                                            SearchViewModel.SearchedSubreddits(name = "pics", icon = "https://www.google.com"),
+                                                                            SearchViewModel.SearchedSubreddits(name = "programming", icon = "https://www.google.com")), error = null)
 
             searchViewModel.onAction(Action.Search("android"))
 

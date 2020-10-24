@@ -5,6 +5,6 @@ package com.abhat.search.ui
  */
 data class UIState(
     val isLoading: Boolean = false,
-    val success: List<String>? = null,
+    val success: List<SearchViewModel.SearchedSubreddits>? = null,
     val error: Throwable? = null
 )

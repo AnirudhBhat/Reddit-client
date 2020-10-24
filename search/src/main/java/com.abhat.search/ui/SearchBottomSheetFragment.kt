@@ -9,19 +9,22 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhat.core.common.CoroutineContextProvider
+import com.abhat.core.network.HostSelectionInterceptor
 import com.abhat.feed.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_search_layout.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
 /**
  * Created by Anirudh Uppunda on 24,September,2020
  */
-class SearchBottomSheetFragment(private val contextProvider: CoroutineContextProvider): BottomSheetDialogFragment() {
+class SearchBottomSheetFragment(private val contextProvider: CoroutineContextProvider): BottomSheetDialogFragment(), KoinComponent {
+
+    private val hostSelectionInterceptor: HostSelectionInterceptor by inject()
+
 
     private val ioScope = CoroutineScope(contextProvider.IO + SupervisorJob())
     private val mainScope = CoroutineScope(contextProvider.Main + SupervisorJob())
@@ -47,7 +50,7 @@ class SearchBottomSheetFragment(private val contextProvider: CoroutineContextPro
     private fun setupRecyclerView() {
         rv_search?.layoutManager = LinearLayoutManager(activity)
         rv_search?.adapter = SearchAdapter(mutableListOf()) {
-            (activity as? SearchActivity)?.onSubredditSelect(it)
+            (activity as? SearchActivity)?.onSubredditSelect(it.name)
         }
     }
 
@@ -73,8 +76,9 @@ class SearchBottomSheetFragment(private val contextProvider: CoroutineContextPro
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 ioScope.launch {
                     supervisorScope {
+                        delay(800)
+                        hostSelectionInterceptor.host = "www.reddit.com"
                         searchViewModel.onAction(Action.Search(s.toString()))
-//                        searchViewModel.search(s.toString())
                     }
                 }
             }

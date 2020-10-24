@@ -479,7 +479,8 @@ class FeedAdapterTest {
         null,
             domain = domain,
         isVideo = isVideo,
-        secureMedia = secureMedia)
+        secureMedia = secureMedia,
+        icon = "https://www.google.com")
     }
 
     private fun returnPreview(size: Int): Preview? {

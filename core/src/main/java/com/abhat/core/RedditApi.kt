@@ -48,7 +48,7 @@ interface RedditApi {
     @GET("subreddits/mine/subscriber/")
     fun getSubscribedSubreddits(@HeaderMap headers: Map<String, String>, @Query("limit") limit: Int): Deferred<RedditResponse>
 
-    @GET("user/{user_name}/saved/")
+    @GET("user/kernel_pan1c/saved/")
     fun getSavedPosts(@HeaderMap headers: Map<String, String>, @Query("after") after: String = ""): Deferred<RedditResponse>
 
     @GET("subreddits/search.json")

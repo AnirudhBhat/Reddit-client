@@ -322,7 +322,8 @@ object FakeRedditResponse {
             null,
             domain = domain,
             isVideo = isVideo,
-            secureMedia = null)
+            secureMedia = null,
+            icon = "https://www.google.com")
     }
 
     fun returnRepliesResponse(): RedditResponse {

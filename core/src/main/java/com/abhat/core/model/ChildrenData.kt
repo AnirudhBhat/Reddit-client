@@ -83,5 +83,7 @@ data class ChildrenData(
     @field:Json(name="is_video")
     val isVideo: Boolean = false,
     @field:Json(name="domain")
-    val domain: String
+    val domain: String,
+    @field:Json(name="icon_img")
+    val icon: String?
 ): Parcelable
